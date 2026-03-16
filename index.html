@@ -2,767 +2,386 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Habitación 3D - Inventario Mejorado</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: Arial, Helvetica, sans-serif;
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            background-color: #111;
-        }
-
-        /* --- SCROLLBAR PERSONALIZADO --- */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
-
-        /* --- BOTONES SUPERIORES --- */
-        .top-btn {
-            position: absolute;
-            top: 20px;
-            width: 44px;
-            height: 44px;
-            background: rgba(30,30,40,0.85);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 300;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s;
-            user-select: none;
-        }
-        .top-btn:hover { transform: scale(1.15); background: rgba(50,50,60,0.95); }
-        .top-btn:active { transform: scale(0.95); }
-        
-        #settings-button { right: 20px; }
-        #inventory-button { right: 75px; }
-
-        /* --- UI DE MONEDAS --- */
-        #coin-display {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(30,30,40,0.85);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,215,0,0.5);
-            color: gold;
-            padding: 10px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 16px;
-            z-index: 300;
-            user-select: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: transform 0.3s;
-        }
-        #coin-display:hover { transform: scale(1.05); }
-
-        /* --- PANELES --- */
-        #settings-panel {
-            position: absolute;
-            top: 70px;
-            right: 20px;
-            background: rgba(30,30,40,0.95);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
-            z-index: 250;
-            font-size: 14px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            pointer-events: auto;
-            display: none;
-            min-width: 200px;
-            animation: fadeInDown 0.3s ease forwards;
-        }
-        #settings-panel.visible { display: block; }
-        #settings-panel label {
-            display: flex; align-items: center; justify-content: space-between; gap: 15px; cursor: pointer; user-select: none; margin-bottom: 10px;
-            transition: color 0.2s;
-        }
-        #settings-panel label:hover { color: #4CAF50; }
-        #settings-panel input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #4CAF50; }
-        
-        #quality-indicator {
-            background: #4CAF50; color: white; padding: 4px 10px; border-radius: 50px; font-size: 12px; font-weight: bold; letter-spacing: 0.5px; text-align: center; margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
-        }
-
-        /* --- MODAL INVENTARIO / TIENDA --- */
-        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        
-        #inventory-modal {
-            display: none; position: fixed; top: 5%; left: 5%; width: 90%; height: 90%;
-            background: rgba(20,20,25,0.85); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.15); border-radius: 20px;
-            z-index: 1000; color: white; padding: 20px; box-sizing: border-box;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
-            flex-direction: column;
-        }
-        #inventory-modal.visible { display: flex; animation: modalFadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1); }
-        
-        #inv-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-        #inv-header h2 { margin: 0; font-size: 24px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        #close-inv { cursor: pointer; font-size: 24px; background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; transition: 0.2s; }
-        #close-inv:hover { background: rgba(255,50,50,0.6); transform: rotate(90deg); }
-        
-        #inv-body { display: flex; flex: 1; margin-top: 15px; gap: 20px; overflow: hidden; }
-        
-        /* SISTEMA DE CATEGORÍAS ACORDEÓN */
-        #inv-sidebar { width: 30%; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; padding-right: 10px; }
-        
-        .inv-group { margin-bottom: 10px; }
-        .group-btn {
-            width: 100%; text-align: left; padding: 12px 15px; background: rgba(0,0,0,0.5);
-            color: white; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
-            cursor: pointer; font-size: 15px; font-weight: bold;
-            display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease;
-        }
-        .group-btn:hover { background: rgba(255,255,255,0.15); transform: translateX(2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .group-content {
-            display: none; flex-direction: column; padding-left: 10px; margin-top: 5px;
-            border-left: 2px solid rgba(255,255,255,0.1); margin-left: 8px;
-            animation: slideDown 0.3s ease;
-        }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-        .group-content.open { display: flex; }
-
-        .cat-btn { 
-            width: 100%; text-align: left; padding: 10px 15px; background: transparent; 
-            color: #bbb; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 4px; 
-            font-size: 14px; transition: 0.2s; display: flex; align-items: center; gap: 10px;
-        }
-        .cat-btn:hover { background: rgba(255,255,255,0.08); color: white; padding-left: 18px; }
-        .cat-btn.active { background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white; font-weight: bold; box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3); }
-        .cat-icon-emoji { font-size: 18px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
-        
-        /* CONTENIDO DE ÍTEMS CON IMÁGENES DE PREVIEW */
-        #inv-content {
-            width: 70%;
-            overflow-y: auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px;
-            align-content: start;
-            padding-right: 5px;
-        }
-        .item-card {
-            background: linear-gradient(145deg, rgba(40,40,50,0.9), rgba(25,25,30,0.9));
-            padding: 15px;
-            border-radius: 18px;
-            border: 1px solid rgba(255,255,255,0.05);
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .item-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-            border-color: rgba(255,255,255,0.2);
-        }
-        .item-preview {
-            width: 100%;
-            height: 120px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
-            margin-bottom: 12px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .item-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        .item-preview .placeholder {
-            font-size: 40px;
-            opacity: 0.5;
-        }
-        .item-card h4 {
-            margin: 0 0 8px 0;
-            font-size: 16px;
-            color: #fff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
-        .item-price {
-            color: #FFD700;
-            font-weight: bold;
-            margin-bottom: 15px;
-            font-size: 14px;
-            text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
-        }
-        .item-btn {
-            padding: 10px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 0.5px;
-        }
-        
-        .btn-buy { background: linear-gradient(135deg, #FF9800, #F57C00); color: white; box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3); }
-        .btn-buy:hover { background: linear-gradient(135deg, #FFB74D, #FF9800); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255, 152, 0, 0.4); }
-        
-        .btn-equip { background: linear-gradient(135deg, #2196F3, #1976D2); color: white; box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3); }
-        .btn-equip:hover { background: linear-gradient(135deg, #64B5F6, #2196F3); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4); }
-        
-        .btn-equipped { background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white; cursor: default; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2), 0 0 10px rgba(76, 175, 80, 0.4); border: 1px solid rgba(129, 199, 132, 0.5); }
-
-        @media (max-width: 600px) {
-            .top-btn { top: 10px; width: 40px; height: 40px; font-size: 20px; }
-            #settings-button { right: 10px; }
-            #inventory-button { right: 60px; }
-            #settings-panel { top: 60px; right: 10px; padding: 12px 15px; font-size: 13px; min-width: 180px; }
-            #coin-display { top: 10px; left: 10px; font-size: 14px; padding: 8px 12px; }
-            #inventory-modal { top: 2%; left: 2%; width: 96%; height: 96%; padding: 15px; }
-            #inv-body { flex-direction: column; gap: 10px; }
-            #inv-sidebar { width: 100%; height: 35%; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; padding-right: 0; }
-            #inv-content { width: 100%; height: 65%; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); padding-right: 0; }
-            .item-card { padding: 12px; }
-            .item-preview { height: 100px; }
-        }
-
-        /* --- ESTADOS --- */
-        #loading, #light-status {
-            position: absolute; bottom: 20px; color: white; background: rgba(0,0,0,0.6); padding: 8px 15px; border-radius: 12px; font-size: 13px; z-index: 100; pointer-events: none; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); font-weight: bold;
-        }
-        #loading { right: 20px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
-        #light-status { left: 20px; transition: 0.3s; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>OS Virtual · Edición Definitiva</title>
+    <link rel="stylesheet" href="styles_pc.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div id="coin-display">🪙 <span id="coin-amount">0</span></div>
-    
-    <div id="inventory-button" class="top-btn" title="Inventario y Tienda">🎒</div>
-    <div id="settings-button" class="top-btn" title="Ajustes">⚙️</div>
+    <canvas id="bg-canvas"></canvas>
+    <canvas id="matrix-canvas" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:-9; pointer-events:none; display:none;"></canvas>
 
-    <div id="settings-panel">
-        <div id="quality-indicator">Calidad Alta</div>
-        <label>
-            <span>Modo humilde</span>
-            <input type="checkbox" id="performance-mode">
-        </label>
+    <div id="desktop" oncontextmenu="showContextMenu(event); return false;">
+        <!-- Iconos del escritorio -->
+        <div class="desktop-icons-container" id="desktop-icons"></div>
+
+        <!-- Papelera -->
+        <div class="desktop-icon" id="trash-icon" ondblclick="openApp('trash', '🗑️')">
+            <div class="icon-img">🗑️</div><span>Papelera</span>
+        </div>
+
+        <!-- VENTANAS (APPS) -->
+        <!-- Navegador mejorado -->
+        <div id="window-browser" class="window hidden" data-app="browser">
+            <div class="window-header" onmousedown="startDrag(event, 'window-browser')">
+                <span><i class="fas fa-globe" style="margin-right: 8px;"></i>Navegador Web</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('browser')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-browser')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('browser')"></button>
+                </div>
+            </div>
+            <div class="window-content" style="padding: 0; display: flex; flex-direction: column;">
+                <div style="display: flex; padding: 8px; background: #f0f0f0; gap: 5px;">
+                    <input type="text" id="browser-url" placeholder="Buscar en Google o escribir URL" value="https://www.google.com" style="flex:1; padding: 5px;">
+                    <button onclick="navigateBrowser()">Ir</button>
+                </div>
+                <iframe id="browser-frame" src="https://www.google.com/webhp?igu=1" style="width:100%; height:100%; border:none;"></iframe>
+            </div>
+        </div>
+
+        <!-- Bloc de notas -->
+        <div id="window-notes" class="window hidden" data-app="notes">
+            <div class="window-header" onmousedown="startDrag(event, 'window-notes')">
+                <span><i class="fas fa-pen" style="margin-right: 8px;"></i>Bloc de Notas</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('notes')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-notes')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('notes')"></button>
+                </div>
+            </div>
+            <div class="window-content" style="padding: 0;">
+                <textarea id="notepad-text" placeholder="Escribe tus ideas aquí... se guardarán automáticamente."></textarea>
+            </div>
+        </div>
+
+        <!-- Calculadora -->
+        <div id="window-calc" class="window hidden" style="width: 320px; height: 440px; min-width: 300px; min-height: 400px;" data-app="calc">
+            <div class="window-header" onmousedown="startDrag(event, 'window-calc')">
+                <span><i class="fas fa-calculator" style="margin-right: 8px;"></i>Calculadora</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('calc')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-calc')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('calc')"></button>
+                </div>
+            </div>
+            <div class="window-content calc-grid">
+                <input type="text" id="calc-display" disabled>
+                <button onclick="calcPress('7')">7</button><button onclick="calcPress('8')">8</button><button onclick="calcPress('9')">9</button><button class="op-btn" onclick="calcPress('/')">÷</button>
+                <button onclick="calcPress('4')">4</button><button onclick="calcPress('5')">5</button><button onclick="calcPress('6')">6</button><button class="op-btn" onclick="calcPress('*')">×</button>
+                <button onclick="calcPress('1')">1</button><button onclick="calcPress('2')">2</button><button onclick="calcPress('3')">3</button><button class="op-btn" onclick="calcPress('-')">-</button>
+                <button class="clear-btn" onclick="calcPress('C')">C</button><button onclick="calcPress('0')">0</button><button class="eq-btn" onclick="calcPress('=')">=</button><button class="op-btn" onclick="calcPress('+')">+</button>
+            </div>
+        </div>
+
+        <!-- Terminal mejorada -->
+        <div id="window-terminal" class="window hidden" style="width: 650px; height: 450px;" data-app="terminal">
+            <div class="window-header" onmousedown="startDrag(event, 'window-terminal')">
+                <span><i class="fas fa-terminal" style="margin-right: 8px;"></i>Terminal</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('terminal')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-terminal')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('terminal')"></button>
+                </div>
+            </div>
+            <div class="window-content terminal-bg">
+                <div id="term-output">OS_VIRTUAL Premium v8.0<br>Escribe 'ayuda' para ver los comandos.</div>
+                <div class="term-input-line">
+                    <span style="color: var(--accent-color);">root@sistema:~$</span>
+                    <input type="text" id="term-input" autocomplete="off" onkeypress="handleTerminal(event)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Galería -->
+        <div id="window-fotos" class="window hidden" style="width: 700px; height: 500px;" data-app="fotos">
+            <div class="window-header" onmousedown="startDrag(event, 'window-fotos')">
+                <span><i class="fas fa-images" style="margin-right: 8px;"></i>Galería</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('fotos')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-fotos')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('fotos')"></button>
+                </div>
+            </div>
+            <div class="window-content gallery-grid" id="gallery-grid"></div>
+        </div>
+
+        <!-- Ajustes con más opciones -->
+        <div id="window-ajustes" class="window hidden" style="width: 400px; height: 550px;" data-app="ajustes">
+            <div class="window-header" onmousedown="startDrag(event, 'window-ajustes')">
+                <span><i class="fas fa-cog" style="margin-right: 8px;"></i>Ajustes</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('ajustes')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-ajustes')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('ajustes')"></button>
+                </div>
+            </div>
+            <div class="window-content settings-panel">
+                <h3>Personalización</h3>
+                <p>Color de acento:</p>
+                <div class="color-picker">
+                    <div class="color-swatch" style="background: #00C9FF;" onclick="changeTheme('#00C9FF')"></div>
+                    <div class="color-swatch" style="background: #FF5F56;" onclick="changeTheme('#FF5F56')"></div>
+                    <div class="color-swatch" style="background: #34C759;" onclick="changeTheme('#34C759')"></div>
+                    <div class="color-swatch" style="background: #FFBD2E;" onclick="changeTheme('#FFBD2E')"></div>
+                    <div class="color-swatch" style="background: #B145E9;" onclick="changeTheme('#B145E9')"></div>
+                    <div class="color-swatch" style="background: #FF3366;" onclick="changeTheme('#FF3366')"></div>
+                </div>
+                <hr>
+                <p><strong>Fondo de escritorio</strong></p>
+                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                    <button onclick="setWallpaper('particles')">Partículas</button>
+                    <button onclick="setRandomWallpaper()">Aleatorio</button>
+                    <button onclick="setWallpaperFromPrompt()">Elegir URL</button>
+                </div>
+                <hr>
+                <p><strong>Fondo de perfil</strong></p>
+                <div id="profile-preview" style="width: 100px; height: 100px; border-radius: 50%; background: #ccc; margin: 10px auto; background-size: cover; background-position: center;"></div>
+                <button onclick="setProfilePicture()">Cambiar foto</button>
+                <hr>
+                <p><strong>Efectos</strong></p>
+                <button onclick="toggleMatrix()">Lluvia Matrix</button>
+                <button onclick="togglePowerSaver()">Modo ahorro</button>
+                <hr>
+                <p><strong>Modo oscuro/claro</strong></p>
+                <button onclick="toggleDarkMode()">Alternar</button>
+                <hr>
+                <p>Sistema v8.0 · Edición Definitiva</p>
+            </div>
+        </div>
+
+        <!-- EXPLORADOR DE ARCHIVOS -->
+        <div id="window-files" class="window hidden" style="width: 600px; height: 450px;" data-app="files">
+            <div class="window-header" onmousedown="startDrag(event, 'window-files')">
+                <span><i class="fas fa-folder-open" style="margin-right: 8px;"></i>Explorador</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('files')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-files')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('files')"></button>
+                </div>
+            </div>
+            <div class="window-content" style="padding: 10px; background: #1e1e2f; color: white;">
+                <div style="margin-bottom: 8px;" id="file-path">📁 /</div>
+                <div id="file-list" style="display: flex; flex-wrap: wrap; gap: 15px; overflow-y: auto; height: calc(100% - 50px);"></div>
+            </div>
+        </div>
+
+        <!-- REPRODUCTOR DE MÚSICA con visualizador -->
+        <div id="window-music" class="window hidden" style="width: 450px; height: 550px;" data-app="music">
+            <div class="window-header" onmousedown="startDrag(event, 'window-music')">
+                <span><i class="fas fa-music" style="margin-right: 8px;"></i>Reproductor</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('music')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-music')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('music')"></button>
+                </div>
+            </div>
+            <div class="window-content" style="background: #282a36; color: white; padding: 15px; display: flex; flex-direction: column;">
+                <div id="current-song" style="font-size: 1.2rem; margin-bottom: 10px; text-align: center;">Selecciona una canción</div>
+                <canvas id="visualizer" width="400" height="100" style="width:100%; height:100px; background:#000; margin-bottom:10px;"></canvas>
+                <audio id="audio-player" controls style="width:100%; margin-bottom: 15px;"></audio>
+                <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
+                    <button id="prev-btn" class="music-btn"><i class="fas fa-step-backward"></i></button>
+                    <button id="play-pause-btn" class="music-btn"><i class="fas fa-play"></i></button>
+                    <button id="next-btn" class="music-btn"><i class="fas fa-step-forward"></i></button>
+                </div>
+                <div style="flex-grow: 1; overflow-y: auto;">
+                    <ul id="playlist" style="list-style: none; padding: 0;"></ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- JUEGO: Tres en Raya -->
+        <div id="window-ttt" class="window hidden" style="width: 350px; height: 400px;" data-app="ttt">
+            <div class="window-header" onmousedown="startDrag(event, 'window-ttt')">
+                <span><i class="fas fa-gamepad" style="margin-right: 8px;"></i>Tres en Raya</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('ttt')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-ttt')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('ttt')"></button>
+                </div>
+            </div>
+            <div class="window-content" style="background: #2d2d3a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div id="ttt-turn" style="margin-bottom: 15px;">Turno de ❌</div>
+                <div id="ttt-board" style="display: grid; grid-template-columns: repeat(3, 80px); gap: 5px;"></div>
+                <button id="ttt-reset" style="margin-top: 20px; padding: 8px 20px;">Reiniciar</button>
+            </div>
+        </div>
+
+        <!-- JUEGO: Snake (corregido) -->
+        <div id="window-snake" class="window hidden" style="width: 400px; height: 500px;" data-app="snake">
+            <div class="window-header" onmousedown="startDrag(event, 'window-snake')">
+                <span><i class="fas fa-gamepad"></i> Snake</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('snake')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-snake')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('snake')"></button>
+                </div>
+            </div>
+            <div class="window-content" style="background:#111; display:flex; flex-direction:column; align-items:center;">
+                <canvas id="snake-canvas" width="300" height="300" style="border:1px solid var(--neon-cyan); margin:10px;"></canvas>
+                <div style="color:white;">Puntuación: <span id="snake-score">0</span> | Máxima: <span id="snake-highscore">0</span></div>
+                <button id="snake-reset" style="margin:5px;">Reiniciar</button>
+                <div style="color:#aaa; font-size:12px;">Usa las flechas del teclado</div>
+            </div>
+        </div>
+
+        <!-- JUEGO: 2048 -->
+        <div id="window-2048" class="window hidden" style="width: 400px; height: 500px;" data-app="2048">
+            <div class="window-header" onmousedown="startDrag(event, 'window-2048')">
+                <span><i class="fas fa-th"></i> 2048</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('2048')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-2048')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('2048')"></button>
+                </div>
+            </div>
+            <div class="window-content" style="background:#222; display:flex; flex-direction:column; align-items:center;">
+                <div id="game-2048" style="margin:20px;"></div>
+                <div style="color:white;">Puntuación: <span id="score-2048">0</span></div>
+                <button id="reset-2048" style="margin:5px;">Nuevo juego</button>
+            </div>
+        </div>
+
+        <!-- JUEGO: Memorama -->
+        <div id="window-memory" class="window hidden" style="width: 450px; height: 500px;" data-app="memory">
+            <div class="window-header" onmousedown="startDrag(event, 'window-memory')">
+                <span><i class="fas fa-brain"></i> Memorama</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('memory')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-memory')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('memory')"></button>
+                </div>
+            </div>
+            <div class="window-content" style="background:#333; display:flex; flex-direction:column; align-items:center;">
+                <div id="memory-grid" style="display:grid; grid-template-columns:repeat(4,80px); gap:10px; margin:20px;"></div>
+                <button id="memory-reset">Reiniciar</button>
+            </div>
+        </div>
+
+        <!-- JUEGO: Ahorcado -->
+        <div id="window-hangman" class="window hidden" style="width: 400px; height: 500px;" data-app="hangman">
+            <div class="window-header" onmousedown="startDrag(event, 'window-hangman')">
+                <span><i class="fas fa-skull"></i> Ahorcado</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('hangman')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-hangman')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('hangman')"></button>
+                </div>
+            </div>
+            <div class="window-content" style="background:#222; color:white; padding:20px; text-align:center;">
+                <div id="hangman-word" style="font-size:2rem; letter-spacing:10px;"></div>
+                <div id="hangman-letters" style="margin:20px 0;"></div>
+                <div id="hangman-attempts">Intentos restantes: 6</div>
+                <button id="hangman-reset">Nueva palabra</button>
+            </div>
+        </div>
+
+        <!-- PAPELERA -->
+        <div id="window-trash" class="window hidden" style="width: 500px; height: 400px;" data-app="trash">
+            <div class="window-header" onmousedown="startDrag(event, 'window-trash')">
+                <span><i class="fas fa-trash" style="margin-right: 8px;"></i>Papelera</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('trash')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-trash')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('trash')"></button>
+                </div>
+            </div>
+            <div class="window-content" style="background: #f0f0f0; padding: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom:10px;">
+                    <span>Elementos en papelera: <span id="trash-count">0</span></span>
+                    <button id="empty-trash" style="background:#ff5f56; color:white; border:none; padding:5px 10px; border-radius:4px;">Vaciar papelera</button>
+                </div>
+                <div id="trash-items" style="display: flex; flex-wrap: wrap; gap: 20px; overflow-y: auto; height: 280px;"></div>
+            </div>
+        </div>
+
+        <!-- EDITOR DE IMÁGENES -->
+        <div id="window-editor" class="window hidden" style="width: 650px; height: 550px;" data-app="editor">
+            <div class="window-header" onmousedown="startDrag(event, 'window-editor')">
+                <span><i class="fas fa-paint-brush"></i> Editor de Imágenes</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('editor')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-editor')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('editor')"></button>
+                </div>
+            </div>
+            <div class="window-content" style="background:#222; color:white; padding:10px;">
+                <canvas id="editor-canvas" width="500" height="300" style="border:1px solid #444; width:100%; height:auto;"></canvas>
+                <div style="margin-top:10px; display:flex; gap:5px; flex-wrap:wrap;">
+                    <button onclick="applyFilter('grayscale')">Grises</button>
+                    <button onclick="applyFilter('sepia')">Sepia</button>
+                    <button onclick="applyFilter('invert')">Invertir</button>
+                    <button onclick="applyFilter('brightness')">Brillo+</button>
+                    <button onclick="applyFilter('blur')">Blur</button>
+                    <button onclick="applyFilter('sharpen')">Enfocar</button>
+                    <button onclick="applyFilter('contrast')">Contraste</button>
+                    <input type="file" id="imageUpload" accept="image/*">
+                    <button onclick="resetImage()">Restaurar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- APLICACIÓN CLIMA -->
+        <div id="window-weather" class="window hidden" style="width: 300px; height: 200px;" data-app="weather">
+            <div class="window-header" onmousedown="startDrag(event, 'window-weather')">
+                <span><i class="fas fa-cloud-sun"></i> Clima</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('weather')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-weather')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('weather')"></button>
+                </div>
+            </div>
+            <div class="window-content" style="padding:20px; text-align:center;">
+                <div id="weather-info">Cargando...</div>
+            </div>
+        </div>
+
+        <!-- Menú Inicio mejorado -->
+        <div id="start-menu" class="hidden">
+            <div style="padding:10px;">
+                <input type="text" id="start-search" placeholder="Buscar aplicaciones..." style="width:100%; padding:8px; background:#333; border:1px solid var(--neon-cyan); color:white; border-radius:4px;">
+            </div>
+            <div class="start-menu-apps" id="start-menu-apps"></div>
+            <div class="start-footer">
+                <div class="power-btn" onclick="showShutdownDialog()"><i class="fas fa-power-off"></i> Apagar</div>
+            </div>
+        </div>
+
+        <!-- Barra de tareas -->
+        <div id="taskbar">
+            <div class="taskbar-left">
+                <button id="start-btn">
+                    <i class="fas fa-bolt start-icon"></i>
+                </button>
+            </div>
+            <div id="taskbar-apps"></div>
+            <div class="taskbar-right system-tray">
+                <span id="weather-widget"><i class="fas fa-sun"></i> 24°C</span>
+                <span id="battery-widget"><i class="fas fa-battery-full"></i> 100%</span>
+                <span><i class="fas fa-wifi"></i></span>
+                <span><i class="fas fa-volume-up"></i></span>
+                <div id="clock">--:--</div>
+            </div>
+        </div>
     </div>
 
-    <div id="inventory-modal">
-        <div id="inv-header">
-            <h2>🎒 Inventario y Tienda</h2>
-            <button id="close-inv">✖</button>
-        </div>
-        <div id="inv-body">
-            <div id="inv-sidebar"></div>
-            <div id="inv-content"></div>
-        </div>
+    <!-- Menú contextual -->
+    <div id="context-menu" class="context-menu hidden">
+        <ul>
+            <li id="ctx-new-file"><i class="fas fa-file"></i> Nuevo archivo de texto</li>
+            <li id="ctx-new-folder"><i class="fas fa-folder"></i> Nueva carpeta</li>
+            <li id="ctx-wallpaper"><i class="fas fa-image"></i> Cambiar fondo</li>
+            <li id="ctx-sort"><i class="fas fa-sort-alpha-down"></i> Ordenar iconos</li>
+        </ul>
     </div>
 
-    <div id="loading">Preparando habitación...</div>
-    <div id="light-status">💡 Luz encendida</div>
+    <!-- Notificación toast -->
+    <div id="toast" class="toast hidden">Mensaje</div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
-            }
-        }
-    </script>
+    <!-- Vista previa de ventana -->
+    <div id="window-preview" class="window-preview hidden"></div>
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-        import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
-
-        // --- SISTEMA DE DATOS E INVENTARIO ---
-        let playerCoins = parseInt(localStorage.getItem('room_coins')) || 1000;
-        document.getElementById('coin-amount').innerText = playerCoins;
-
-        // CONFIGURACIÓN PRINCIPAL DE ITEMS (ACTUALIZADA CON NUEVAS CATEGORÍAS Y EMOJIS)
-        const defaultInventoryConfig = {
-            // Estructura
-            piso: { label: "Piso", emoji: "🟫", equipped: "base", items: { "base": { name: "Piso Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/piso.glb", price: 0, owned: true } } },
-            paredes: { label: "Paredes", emoji: "🧱", equipped: "base", items: { "base": { name: "Paredes Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/paredes.glb", price: 0, owned: true } } },
-            techo: { label: "Techo", emoji: "🛖", equipped: "base", items: { "base": { name: "Techo Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/techo.glb", price: 0, owned: true } } },
-            puerta: { label: "Puerta", emoji: "🚪", equipped: "base", items: { "base": { name: "Puerta Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/puerta.glb", price: 0, owned: true } } },
-            
-            // Iluminación
-            interruptor: { label: "Interruptor", emoji: "🎛️", equipped: "base", items: { "base": { name: "Interruptor Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/interruptor.glb", price: 0, owned: true } } },
-            foco: { 
-                label: "Foco", emoji: "💡", equipped: "base", 
-                items: { 
-                    "base": { name: "Foco Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/foco.glb", baseFile: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/base_foco.glb", price: 0, owned: true },
-                    "foco_brillante": { name: "Foco Brillante", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/foco.glb", baseFile: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/base_foco.glb", price: 250, owned: false }
-                } 
-            },
-            
-            // Muebles
-            cama: { label: "Cama", emoji: "🛏️", equipped: "base", items: { "base": { name: "Cama Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/cama.glb", price: 0, owned: true }, "cama_brillante": { name: "Cama Brillante", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/cama_brillante.glb", price: 500, owned: false } } },
-            silla: { label: "Silla", emoji: "🪑", equipped: "base", items: { "base": { name: "Silla Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/silla.glb", price: 0, owned: true } } },
-            pc: { label: "Setup PC", emoji: "🖥️", equipped: "base", items: { "base": { name: "PC Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/pc.glb", price: 0, owned: true } } },
-            tele: { label: "Televisor", emoji: "📺", equipped: "base", items: { "base": { name: "Televisor Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/tele.glb", price: 0, owned: true } } },
-            mueble1: { label: "Mueble", emoji: "🗄️", equipped: "base", items: { "base": { name: "Mueble 1 Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/mueble1.glb", price: 0, owned: true } } },
-            mueble2: { label: "Escritorio", emoji: "🗄️", equipped: "base", items: { "base": { name: "Mueble 2 Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/mueble2.glb", price: 0, owned: true } } },
-            
-            // Textiles
-            alfombra: { label: "Alfombra", emoji: "🔲", equipped: "base", items: { "base": { name: "Alfombra Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/alfombra.glb", price: 0, owned: true } } },
-            cortinas: { label: "Cortinas", emoji: "🪟", equipped: "base", items: { "base": { name: "Cortinas Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/cortinas.glb", price: 0, owned: true } } },
-            mousepad: { label: "Mouse Pad", emoji: "🖱️", equipped: "base", items: { "base": { name: "Mouse Pad Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/maouse_pad.glb", price: 0, owned: true } } },
-
-            // Pósters
-            poster_1: { label: "Póster 1", emoji: "🖼️", equipped: "base", items: { "base": { name: "Póster 1 Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/poster_1.glb", price: 0, owned: true } } },
-            poster_2: { label: "Póster 2", emoji: "🖼️", equipped: "base", items: { "base": { name: "Póster 2 Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/poster_2.glb", price: 0, owned: true } } },
-            poster_3: { label: "Póster 3", emoji: "🖼️", equipped: "base", items: { "base": { name: "Póster 3 Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/poster_3.glb", price: 0, owned: true } } },
-            poster_4: { label: "Póster 4", emoji: "🖼️", equipped: "base", items: { "base": { name: "Póster 4 Estándar", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/poster_4.glb", price: 0, owned: true } } },
-            
-            // --- NUEVAS CATEGORÍAS DE DECORACIÓN ---
-            
-            // Decoración del Piso
-            deco_piso: { label: "Adorno Piso", emoji: "🎍", equipped: "base", items: { "base": { name: "Deco Piso", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/decoracion_piso.glb", price: 0, owned: true } } },
-            
-            // Decoración del Escritorio (Incluye libros y reloj del mueble 2 según lo solicitado)
-            deco_escritorio: { label: "Decoración 1", emoji: "🎍", equipped: "base", items: { "base": { name: "Deco Escritorio", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/decoracion_escritorio.glb", price: 0, owned: true } } },
-            deco_mueble_2: { label: "Decoración 2", emoji: "🎍", equipped: "base", items: { "base": { name: "Libros", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/decoracion_mueble_2.glb", price: 0, owned: true } } },
-            deco_2_mueble_2: { label: "Decoración 3", emoji: "🎍", equipped: "base", items: { "base": { name: "Reloj", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/decoracion_2_mueble_2.glb", price: 0, owned: true } } },
-            
-            // Decoración del Mueble 1
-            deco_mueble_1: { label: "Decoración 1", emoji: "🎍", equipped: "base", items: { "base": { name: "Adorno 1", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/decoracion_mueble_1.glb", price: 0, owned: true } } },
-            deco_2_mueble_1: { label: "Decoración 2", emoji: "🎍", equipped: "base", items: { "base": { name: "Adorno 2", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/decoracion_2_mueble_1.glb", price: 0, owned: true } } },
-            deco_3_mueble_1: { label: "Decoración 3", emoji: "🎍", equipped: "base", items: { "base": { name: "Adorno 3", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/decoracion_3_mueble_1.glb", price: 0, owned: true } } },
-            deco_4_mueble_1: { label: "Decoración 4", emoji: "🎍", equipped: "base", items: { "base": { name: "Adorno 4", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/decoracion_4_mueble_1.glb", price: 0, owned: true } } },
-            deco_5_mueble_1: { label: "Decoración 5", emoji: "🎍", equipped: "base", items: { "base": { name: "Adorno 5", file: "https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/decoracion_5_mueble_1.glb", price: 0, owned: true } } }
-        };
-
-        // Estructura visual para la tienda (Acordeones Mejorados)
-        const inventoryGroups = [
-            { id: 'estructura', label: 'Estructura', emoji: '🏠', categories: ['piso', 'paredes', 'techo', 'puerta'] },
-            { id: 'iluminacion', label: 'Iluminación', emoji: '💡', categories: ['interruptor', 'foco'] },
-            { id: 'muebles', label: 'Muebles', emoji: '🛋️', categories: ['cama', 'silla', 'pc', 'tele', 'mueble1', 'mueble2'] },
-            { id: 'textiles', label: 'Textiles', emoji: '🧶', categories: ['alfombra', 'cortinas', 'mousepad'] },
-            { id: 'posters', label: 'Pósters', emoji: '🖼️', categories: ['poster_1', 'poster_2', 'poster_3', 'poster_4'] },
-            
-            // Secciones separadas de decoración
-            { id: 'deco_mueble', label: 'Decoración del Mueble', emoji: '🎍', categories: ['deco_mueble_1', 'deco_2_mueble_1', 'deco_3_mueble_1', 'deco_4_mueble_1', 'deco_5_mueble_1'] },
-            { id: 'deco_escritorio', label: 'Decoración del Escritorio', emoji: '🎍', categories: ['deco_escritorio', 'deco_mueble_2', 'deco_2_mueble_2'] },
-            { id: 'deco_piso', label: 'Decoración del Piso', emoji: '🎍', categories: ['deco_piso'] }
-        ];
-
-        // Cargar o inicializar progreso
-        let inventoryData = JSON.parse(localStorage.getItem('room_inventory')) || defaultInventoryConfig;
-
-        if (inventoryData.base_foco) delete inventoryData.base_foco;
-
-        // Sincronizar objetos nuevos y forzar actualización de rutas y emojis
-        for (let cat in defaultInventoryConfig) {
-            if(!inventoryData[cat]) inventoryData[cat] = defaultInventoryConfig[cat];
-            
-            inventoryData[cat].emoji = defaultInventoryConfig[cat].emoji;
-            inventoryData[cat].label = defaultInventoryConfig[cat].label;
-
-            for(let item in defaultInventoryConfig[cat].items) {
-                if(!inventoryData[cat].items[item]) {
-                    inventoryData[cat].items[item] = defaultInventoryConfig[cat].items[item];
-                } else {
-                    inventoryData[cat].items[item].file = defaultInventoryConfig[cat].items[item].file;
-                    inventoryData[cat].items[item].name = defaultInventoryConfig[cat].items[item].name;
-                    if(defaultInventoryConfig[cat].items[item].baseFile) {
-                        inventoryData[cat].items[item].baseFile = defaultInventoryConfig[cat].items[item].baseFile;
-                    }
-                }
-                // Añadir campo preview si no existe (generado automáticamente)
-                if (!inventoryData[cat].items[item].preview) {
-                    // Suponemos que las imágenes de preview están en la misma carpeta con extensión .png
-                    inventoryData[cat].items[item].preview = `https://cdn.jsdelivr.net/gh/Archinime/ArchiPapu@main/previews/${item}.png`;
-                }
-            }
-        }
-
-        function saveGame() {
-            localStorage.setItem('room_coins', playerCoins);
-            localStorage.setItem('room_inventory', JSON.stringify(inventoryData));
-            document.getElementById('coin-amount').innerText = playerCoins;
-        }
-
-        const loadedSlotMeshes = {};
-        let switchMesh = null;
-        let focoMesh = null;
-
-        // --- Detección de dispositivo ---
-        const ua = navigator.userAgent;
-        const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-        const width = window.innerWidth;
-        let deviceType = (width < 768 || (isMobileUA && width < 1024)) ? 'mobile' : (width >= 768 && width <= 1024) ? 'tablet' : 'desktop';
-
-        // --- Escena y Cámara ---
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x050508); 
-
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.5, 200);
-        let camPosY = 6, camPosZ = 14, targetY = 6;
-        if (deviceType === 'mobile') { camPosY = 6; camPosZ = 12; targetY = 5; }
-        camera.position.set(0, camPosY, camPosZ);
-
-        // --- RENDERIZADOR ---
-        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
-        renderer.outputEncoding = THREE.sRGBEncoding;
-        renderer.toneMapping = THREE.ACESFilmicToneMapping; 
-        renderer.toneMappingExposure = 1.0;
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        document.body.appendChild(renderer.domElement);
-
-        const effect = new OutlineEffect(renderer, {
-            defaultThickness: 0.0008, defaultColor: [0.05, 0.05, 0.08], defaultAlpha: 0.85, defaultKeepAlive: true
-        });
-
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.target.set(0, targetY, 0);
-        controls.maxPolarAngle = Math.PI / 2 - 0.05;
-        controls.minDistance = 2.5; controls.maxDistance = 16;
-        controls.enablePan = false;
-
-        // --- LUCES ---
-        const ambient = new THREE.AmbientLight(0xffffff, 0.3);
-        scene.add(ambient);
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.4); hemiLight.position.set(0, 20, 0); scene.add(hemiLight);
-        
-        const mainLight = new THREE.SpotLight(0xffeedd, 6);
-        mainLight.position.set(2, 22, 2); mainLight.angle = Math.PI / 3; mainLight.penumbra = 0.8; mainLight.decay = 2; mainLight.distance = 60;
-        mainLight.castShadow = true;
-        mainLight.shadow.mapSize.set(2048, 2048);
-        mainLight.shadow.camera.near = 0.5; mainLight.shadow.camera.far = 40; mainLight.shadow.bias = -0.0001; mainLight.shadow.normalBias = 0.02; mainLight.shadow.radius = 4; 
-        scene.add(mainLight); scene.add(mainLight.target);
-
-        let lightOn = localStorage.getItem('lightState') !== 'off';
-        const perfCheck = document.getElementById('performance-mode');
-        perfCheck.checked = localStorage.getItem('performanceMode') === 'true';
-
-        function applyMaterialLogic(model, categoryKey) {
-            const isLow = perfCheck.checked;
-            const isFoco = categoryKey === 'foco';
-            
-            model.traverse((node) => {
-                if (node.isMesh) {
-                    if (isFoco) {
-                        node.castShadow = false; node.receiveShadow = false;
-                        if (node.material) {
-                            node.material.emissive = new THREE.Color(0xffeedd);
-                            node.material.emissiveIntensity = lightOn ? 1.5 : 0;
-                        }
-                    } else {
-                        node.castShadow = !isLow; node.receiveShadow = !isLow;
-                        if(node.material) {
-                            node.material.shadowSide = THREE.FrontSide;
-                            if(node.name.toLowerCase().includes('pared') || node.name.toLowerCase().includes('piso')) {
-                                node.material.shadowSide = THREE.BackSide;
-                            }
-                            node.material.side = THREE.DoubleSide;
-                            node.material.needsUpdate = true;
-                        }
-                    }
-                }
-            });
-        }
-
-        // --- CARGA DE MODELOS ---
-        const loader = new GLTFLoader();
-        let modelsLoaded = 0;
-        let totalModelsToLoad = Object.keys(inventoryData).length + 1; // +1 porque el foco carga su base también
-
-        function checkLoading() {
-            modelsLoaded++;
-            document.getElementById('loading').innerText = `Cargando: ${modelsLoaded}/${totalModelsToLoad}`;
-            if (modelsLoaded >= totalModelsToLoad) {
-                document.getElementById('loading').style.display = 'none';
-            }
-        }
-
-        function loadItemForSlot(categoryKey, itemFile, isInitialLoad = false) {
-            if (!itemFile) return;
-
-            if (loadedSlotMeshes[categoryKey]) {
-                scene.remove(loadedSlotMeshes[categoryKey]);
-            }
-
-            loader.load(itemFile, (gltf) => {
-                const model = gltf.scene;
-                applyMaterialLogic(model, categoryKey);
-                
-                // Lógica especial para Foco y Luz
-                if (categoryKey === 'foco') {
-                    focoMesh = model;
-                    const box = new THREE.Box3().setFromObject(model);
-                    const center = new THREE.Vector3(); box.getCenter(center);
-                    mainLight.position.copy(center); mainLight.position.y -= 0.2; 
-                }
-                
-                // Lógica especial para Interruptor
-                if (categoryKey === 'interruptor') switchMesh = model;
-
-                scene.add(model);
-                loadedSlotMeshes[categoryKey] = model; 
-                if(isInitialLoad) checkLoading();
-            }, undefined, (e) => { 
-                console.error(`Falta el modelo para [${categoryKey}]:`, itemFile); 
-                if(isInitialLoad) checkLoading();
-            });
-        }
-
-        // Cargar todos los objetos equipados al inicio
-        for (let cat in inventoryData) {
-            let equippedItemId = inventoryData[cat].equipped;
-            let itemData = inventoryData[cat].items[equippedItemId];
-            
-            if (itemData && itemData.file) {
-                loadItemForSlot(cat, itemData.file, true);
-            }
-            
-            // Si es el foco, también cargamos su base automáticamente
-            if (cat === 'foco' && itemData && itemData.baseFile) {
-                loadItemForSlot('base_foco', itemData.baseFile, true);
-            }
-        }
-
-        // --- SISTEMA DE ILUMINACIÓN ---
-        function updateLighting() {
-            const isLow = perfCheck.checked;
-            if (lightOn) {
-                mainLight.visible = true;
-                ambient.intensity = isLow ? 0.8 : 0.3; hemiLight.intensity = isLow ? 0.8 : 0.4;
-                document.getElementById('light-status').innerText = '💡 Luz encendida';
-                if (focoMesh) focoMesh.traverse((n) => { if (n.isMesh && n.material) n.material.emissiveIntensity = 1.5; });
-            } else {
-                mainLight.visible = false;
-                ambient.intensity = 0.02; hemiLight.intensity = 0.05; 
-                document.getElementById('light-status').innerText = '💡 Luz apagada';
-                if (focoMesh) focoMesh.traverse((n) => { if (n.isMesh && n.material) n.material.emissiveIntensity = 0; });
-            }
-        }
-
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        
-        function toggleLight() {
-            lightOn = !lightOn;
-            localStorage.setItem('lightState', lightOn ? 'on' : 'off'); updateLighting();
-        }
-
-        function handleInteraction(event) {
-            const rect = renderer.domElement.getBoundingClientRect();
-            const x = event.touches ? event.touches[0].clientX : event.clientX;
-            const y = event.touches ? event.touches[0].clientY : event.clientY;
-            mouse.x = ((x - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((y - rect.top) / rect.height) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            if (switchMesh && raycaster.intersectObject(switchMesh, true).length > 0) {
-                toggleLight();
-            }
-        }
-        
-        renderer.domElement.addEventListener('click', handleInteraction);
-        renderer.domElement.addEventListener('touchstart', (e) => { 
-            if(document.getElementById('inventory-modal').classList.contains('visible')) return;
-            handleInteraction(e); 
-        }, {passive: true});
-
-        // --- Calidad / Modo Humilde ---
-        function updateQuality() {
-            const isLow = perfCheck.checked;
-            renderer.shadowMap.enabled = !isLow;
-            renderer.setPixelRatio(isLow ? 1 : Math.min(window.devicePixelRatio, 2));
-            document.getElementById('quality-indicator').textContent = isLow ? 'Modo Humilde' : 'Calidad Alta';
-            scene.traverse(n => { 
-                if(n.isMesh) { 
-                    if (focoMesh && (n === focoMesh || focoMesh.children.includes(n))) return;
-                    n.castShadow = !isLow; n.receiveShadow = !isLow; 
-                    if(n.material) n.material.needsUpdate = true; 
-                }
-            });
-            localStorage.setItem('performanceMode', isLow);
-            updateLighting(); 
-        }
-        perfCheck.addEventListener('change', updateQuality);
-
-        // --- LÓGICA DE INTERFAZ DEL INVENTARIO ---
-        let currentCategory = 'cama';
-        let openGroup = 'muebles';
-
-        function renderInventory() {
-            const sidebar = document.getElementById('inv-sidebar');
-            const content = document.getElementById('inv-content');
-            sidebar.innerHTML = ''; content.innerHTML = '';
-
-            // Renderizar Grupos y Subcategorías (Acordeón Animado)
-            inventoryGroups.forEach(group => {
-                const groupDiv = document.createElement('div');
-                groupDiv.className = 'inv-group';
-
-                const groupBtn = document.createElement('button');
-                groupBtn.className = 'group-btn';
-                groupBtn.innerHTML = `<span>${group.emoji} ${group.label}</span> <span style="transition:0.3s; transform: ${openGroup === group.id ? 'rotate(90deg)' : 'rotate(0deg)'}">▶</span>`;
-                groupBtn.onclick = () => {
-                    openGroup = openGroup === group.id ? null : group.id;
-                    renderInventory();
-                };
-                groupDiv.appendChild(groupBtn);
-
-                const groupContent = document.createElement('div');
-                groupContent.className = `group-content ${openGroup === group.id ? 'open' : ''}`;
-
-                group.categories.forEach(catKey => {
-                    const catData = inventoryData[catKey];
-                    if(!catData) return;
-                    
-                    const btn = document.createElement('button');
-                    btn.className = `cat-btn ${catKey === currentCategory ? 'active' : ''}`;
-                    btn.innerHTML = `<span class="cat-icon-emoji">${catData.emoji}</span> <span>${catData.label}</span>`;
-                    btn.onclick = () => { currentCategory = catKey; renderInventory(); };
-                    groupContent.appendChild(btn);
-                });
-
-                groupDiv.appendChild(groupContent);
-                sidebar.appendChild(groupDiv);
-            });
-
-            // Renderizar Ítems de la categoría seleccionada con imagen de preview
-            const catData = inventoryData[currentCategory];
-            if (!catData) return;
-            
-            for (let itemId in catData.items) {
-                const item = catData.items[itemId];
-                const isEquipped = catData.equipped === itemId;
-                
-                const card = document.createElement('div');
-                card.className = 'item-card';
-                
-                // Contenedor de imagen de preview
-                const previewDiv = document.createElement('div');
-                previewDiv.className = 'item-preview';
-                const img = document.createElement('img');
-                img.src = item.preview || 'https://via.placeholder.com/150?text=Sin+imagen';
-                img.alt = item.name;
-                img.onerror = () => {
-                    // Si la imagen no carga, mostrar un emoji como placeholder
-                    previewDiv.innerHTML = '<span class="placeholder">📦</span>';
-                };
-                previewDiv.appendChild(img);
-                
-                let btnHTML = '';
-                if (isEquipped) {
-                    btnHTML = `<button class="item-btn btn-equipped" disabled>Equipado ✓</button>`;
-                } else if (item.owned) {
-                    btnHTML = `<button class="item-btn btn-equip" data-id="${itemId}">Equipar</button>`;
-                } else {
-                    btnHTML = `<button class="item-btn btn-buy" data-id="${itemId}">Comprar 🪙${item.price}</button>`;
-                }
-
-                card.innerHTML = `
-                    <div>
-                        ${previewDiv.outerHTML}
-                        <h4>${item.name}</h4>
-                        <div class="item-price">${item.owned ? 'Adquirido' : `🪙 ${item.price}`}</div>
-                    </div>
-                    ${btnHTML}
-                `;
-                
-                // Reemplazar el previewDiv con el elemento real para que funcione onerror
-                const finalCard = card;
-                const previewContainer = finalCard.querySelector('.item-preview');
-                if (previewContainer) {
-                    previewContainer.innerHTML = ''; // Limpiar
-                    previewContainer.appendChild(img);
-                }
-                
-                content.appendChild(finalCard);
-            }
-
-            document.querySelectorAll('.btn-equip').forEach(b => {
-                b.onclick = (e) => equipItem(currentCategory, e.target.getAttribute('data-id'));
-            });
-            document.querySelectorAll('.btn-buy').forEach(b => {
-                b.onclick = (e) => buyItem(currentCategory, e.target.getAttribute('data-id'));
-            });
-        }
-
-        function equipItem(category, itemId) {
-            inventoryData[category].equipped = itemId;
-            saveGame();
-            renderInventory(); 
-            
-            const itemData = inventoryData[category].items[itemId];
-            loadItemForSlot(category, itemData.file, false);
-
-            if (category === 'foco' && itemData.baseFile) {
-                loadItemForSlot('base_foco', itemData.baseFile, false);
-            }
-        }
-
-        function buyItem(category, itemId) {
-            let item = inventoryData[category].items[itemId];
-            if (playerCoins >= item.price) {
-                playerCoins -= item.price;
-                item.owned = true;
-                saveGame();
-                renderInventory();
-            } else {
-                alert("No tienes suficientes monedas.");
-            }
-        }
-
-        // Eventos UI
-        document.getElementById('inventory-button').onclick = () => {
-            document.getElementById('inventory-modal').classList.add('visible');
-            renderInventory();
-        };
-        document.getElementById('close-inv').onclick = () => {
-            document.getElementById('inventory-modal').classList.remove('visible');
-        };
-        document.getElementById('settings-button').onclick = () => {
-            document.getElementById('settings-panel').classList.toggle('visible');
-        };
-
-        // --- Animación y Resize ---
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            effect.render(scene, camera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            effect.setSize(window.innerWidth, window.innerHeight); 
-        });
-
-        updateQuality();
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
