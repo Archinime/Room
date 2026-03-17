@@ -13,12 +13,12 @@
 
     <div id="desktop" oncontextmenu="showContextMenu(event, 'desktop'); return false;">
         <div class="desktop-icons-container" id="desktop-icons">
-            <div class="desktop-icon" id="trash-icon" data-appid="trash" style="left: 20px; top: 20px;">
+            <div class="desktop-icon" id="trash-icon" data-appid="trash" style="left: 10px; top: 10px;">
                 <div class="icon-img">🗑️</div><span class="icon-label">Papelera</span>
             </div>
         </div>
 
-        <div id="window-browser" class="window hidden" data-app="browser">
+        <div id="window-browser" class="window hidden app-large" data-app="browser">
             <div class="window-header">
                 <span><i class="fas fa-globe"></i> Navegador Web</span>
                 <div class="window-controls">
@@ -29,16 +29,16 @@
             </div>
             <div class="window-content" style="padding: 0; display: flex; flex-direction: column;">
                 <div style="display: flex; padding: 8px; background: #f0f0f0; gap: 5px;">
-                    <input type="text" id="browser-url" placeholder="Buscar URL..." value="https://www.google.com" style="flex:1; padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
-                    <button onclick="navigateBrowser()" style="padding: 5px 15px; border-radius: 4px; border: none; background: var(--accent-color); color: #000; cursor: pointer;">Ir</button>
+                    <input type="text" id="browser-url" placeholder="Buscar URL o término..." value="https://archinime.github.io/-Archinime-/index.html" style="flex:1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px;">
+                    <button onclick="navigateBrowser()" style="padding: 8px 15px; border-radius: 6px; border: none; background: var(--accent-color); color: #000; cursor: pointer; font-weight: bold;">Ir</button>
                 </div>
-                <iframe id="browser-frame" src="https://www.google.com/webhp?igu=1" style="width:100%; height:100%; border:none;"></iframe>
+                <iframe id="browser-frame" src="https://archinime.github.io/-Archinime-/index.html" style="width:100%; height:100%; border:none; flex-grow: 1;"></iframe>
             </div>
         </div>
 
-        <div id="window-notes" class="window hidden" data-app="notes">
+        <div id="window-notes" class="window hidden app-medium" data-app="notes">
             <div class="window-header">
-                <span><i class="fas fa-pen"></i> Bloc de Notas</span>
+                <span><i class="fas fa-pen"></i> Bloc de Notas <span id="note-current-file" style="font-size: 10px; opacity: 0.7;">(Sin guardar)</span></span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('notes')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-notes')"></button>
@@ -46,7 +46,7 @@
                 </div>
             </div>
             <div class="window-content" style="padding: 0;">
-                <textarea id="notepad-text" placeholder="Escribe tus ideas aquí... se guardarán automáticamente."></textarea>
+                <textarea id="notepad-text" placeholder="Escribe tus ideas aquí... se guardarán automáticamente en el sistema."></textarea>
             </div>
         </div>
 
@@ -95,6 +95,13 @@
                     <button class="win-btn close-btn" onclick="closeApp('fotos')"></button>
                 </div>
             </div>
+            <div style="background: #e0e0e5; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="color:#333; font-weight:bold; font-size:14px;">Imágenes Guardadas</span>
+                <label class="neon-btn-small" style="cursor:pointer; margin:0;">
+                    <i class="fas fa-plus"></i> Añadir Imagen
+                    <input type="file" id="gallery-upload" accept="image/*" style="display:none;" onchange="uploadGalleryImage(event)">
+                </label>
+            </div>
             <div class="window-content gallery-grid" id="gallery-grid"></div>
         </div>
 
@@ -121,18 +128,21 @@
                 <hr>
                 <p><strong>Fondo de escritorio</strong></p>
                 <div style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px;">
-                    <button class="neon-btn-small" onclick="setWallpaper('particles')">Partículas</button>
-                    <button class="neon-btn-small" onclick="setRandomWallpaper()">Cyberpunk</button>
-                    <button class="neon-btn-small" onclick="setWallpaperFromPrompt()">URL</button>
+                    <button class="neon-btn-small" onclick="cyclePremiumWallpapers()"><i class="fas fa-image"></i> Cambiar Fondo Aleatorio</button>
+                    <button class="neon-btn-small" onclick="setWallpaper('particles')">Partículas Interactivas</button>
+                    <button class="neon-btn-small" onclick="setWallpaperFromPrompt()">Cargar por URL</button>
                     <label class="neon-btn-small" style="cursor:pointer; text-align:center;">
-                        Subir
+                        Subir desde Galería (Max 20MB)
                         <input type="file" id="local-wallpaper-upload" accept="image/*" style="display:none;" onchange="uploadLocalWallpaper(event)">
                     </label>
                 </div>
+                <p style="font-size: 12px; margin-top: 10px;">Catálogo de Fondos Premium:</p>
+                <div id="wallpaper-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 10px; max-height: 200px; overflow-y: auto; padding-right: 5px;"></div>
+                
                 <hr>
                 <p><strong>Fondo de perfil</strong></p>
                 <div id="profile-preview" style="width: 80px; height: 80px; border-radius: 50%; background: #ccc; margin: 10px auto; background-size: cover; background-position: center;"></div>
-                <button class="neon-btn-small" onclick="setProfilePicture()">Cambiar foto</button>
+                <button class="neon-btn-small" onclick="setProfilePicture()" style="display:block; margin: 0 auto;">Cambiar foto</button>
                 <hr>
                 <p><strong>Sonido y Efectos</strong></p>
                 <button class="neon-btn-small" onclick="toggleSound()">SFX: <span id="sound-status">ON</span></button>
@@ -153,8 +163,14 @@
                 </div>
             </div>
             <div class="window-content" style="padding: 10px; background: #1e1e2f; color: white;">
-                <div style="margin-bottom: 8px;" id="file-path">📁 /</div>
-                <div id="file-list" style="display: flex; flex-wrap: wrap; gap: 15px; overflow-y: auto; height: calc(100% - 50px);"></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">
+                    <div style="font-family: monospace; align-self: center;" id="file-path">📁 /</div>
+                    <div style="display:flex; gap:5px;">
+                        <button class="neon-btn-small" onclick="uiCreateFolder()" style="background:var(--accent-color); border:none;">+ Carpeta</button>
+                        <button class="neon-btn-small" onclick="uiCreateFile()">+ Nota</button>
+                    </div>
+                </div>
+                <div id="file-list" style="display: flex; flex-wrap: wrap; gap: 15px; overflow-y: auto; height: calc(100% - 40px); align-content: flex-start;"></div>
             </div>
         </div>
 
@@ -168,7 +184,7 @@
                 </div>
             </div>
             <div class="window-content" style="background: #282a36; color: white; padding: 15px; display: flex; flex-direction: column;">
-                <div id="current-song" style="font-size: 1.1rem; margin-bottom: 10px; text-align: center;">Selecciona una pista</div>
+                <div id="current-song" style="font-size: 1.1rem; margin-bottom: 10px; text-align: center; font-weight: bold;">Selecciona una pista</div>
                 <canvas id="visualizer" width="400" height="100" style="width:100%; height:80px; background:#000; margin-bottom:10px; border-radius: 8px; border: 1px solid var(--neon-cyan); box-shadow: 0 0 10px rgba(0,243,255,0.2);"></canvas>
                 <audio id="audio-player" controls style="width:100%; margin-bottom: 15px;" crossorigin="anonymous"></audio>
                 <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
@@ -176,7 +192,11 @@
                     <button id="play-pause-btn" class="music-btn"><i class="fas fa-play"></i></button>
                     <button id="next-btn" class="music-btn"><i class="fas fa-step-forward"></i></button>
                 </div>
-                <div style="flex-grow: 1; overflow-y: auto;">
+                <label class="neon-btn-small" style="cursor:pointer; text-align:center; margin-bottom:10px; background:var(--neon-purple); color:#fff; border:none;">
+                    <i class="fas fa-upload"></i> Subir y Guardar Canción (Max 2MB)
+                    <input type="file" accept="audio/*" style="display:none;" onchange="uploadLocalMusic(event)">
+                </label>
+                <div style="flex-grow: 1; overflow-y: auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
                     <ul id="playlist" style="list-style: none; padding: 0;"></ul>
                 </div>
             </div>
@@ -191,7 +211,7 @@
                     <button class="win-btn close-btn" onclick="closeApp('ttt')"></button>
                 </div>
             </div>
-            <div class="window-content ttt-bg" style="position:relative;">
+            <div class="window-content ttt-bg" style="position:relative; overflow-y: auto; padding: 20px 0;">
                 <div id="ttt-turn" class="game-title">Turno <span style="color:var(--neon-cyan);">❌</span></div>
                 <div id="ttt-board" class="ttt-grid"></div>
                 <button id="ttt-reset" class="neon-btn" style="margin-top: 15px;">Reiniciar</button>
@@ -210,7 +230,7 @@
                     <button class="win-btn close-btn" onclick="closeApp('snake')"></button>
                 </div>
             </div>
-            <div class="window-content snake-bg" style="position:relative;">
+            <div class="window-content snake-bg" style="position:relative; overflow-y: auto; padding: 10px;">
                 <div class="snake-stats" style="color:#fff;">NIVEL: <span id="snake-level-display" style="color:var(--neon-yellow);">1/5</span></div>
                 <div class="snake-stats" style="color:#aaa; font-size:0.9rem;">Puntos: <span id="snake-score" style="color:var(--neon-cyan);">0</span> / 100</div>
                 <div style="position:relative; margin-top:10px; width: 100%; max-width: 450px; aspect-ratio: 1/1;">
@@ -234,7 +254,7 @@
                     <button class="win-btn close-btn" onclick="closeApp('pong')"></button>
                 </div>
             </div>
-            <div class="window-content pong-bg" style="position:relative; background:#050508; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 10px;">
+            <div class="window-content pong-bg" style="position:relative; background:#050508; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding: 15px; overflow-y: auto;">
                 <div class="snake-stats" style="color:#fff; margin-bottom: 5px;">NIVEL: <span id="pong-level-display" style="color:var(--neon-yellow);">1</span></div>
                 <div class="snake-stats" style="margin-bottom:10px; width: 100%; max-width: 600px; display:flex; justify-content:space-between;">
                     <span style="color:var(--neon-cyan);">Jugador: <span id="pong-player-score">0</span></span>
@@ -260,8 +280,8 @@
                     <button class="win-btn close-btn" onclick="closeApp('breakout')"></button>
                 </div>
             </div>
-            <div class="window-content snake-bg" style="position:relative; padding: 10px;">
-                <div class="snake-stats" style="color:#fff; display:flex; gap:15px;">
+            <div class="window-content snake-bg" style="position:relative; padding: 15px; overflow-y: auto; justify-content: flex-start;">
+                <div class="snake-stats" style="color:#fff; display:flex; gap:15px; flex-wrap: wrap; justify-content: center;">
                     <span>NIVEL: <span id="breakout-level-display" style="color:var(--neon-yellow);">1</span></span>
                     <span>VIDAS: <span id="breakout-lives" style="color:var(--neon-pink);">3</span></span>
                     <span>SCORE: <span id="breakout-score" style="color:var(--neon-cyan);">0</span></span>
@@ -286,7 +306,7 @@
                     <button class="win-btn close-btn" onclick="closeApp('memory')"></button>
                 </div>
             </div>
-            <div class="window-content memory-bg" style="position:relative;">
+            <div class="window-content memory-bg" style="position:relative; overflow-y: auto; padding: 20px 0;">
                 <div id="memory-grid" class="memory-grid-3d"></div>
                 <button id="memory-reset" class="neon-btn" style="margin-top: 20px;">Nuevo Escaneo</button>
                 <div id="memory-overlay" class="game-overlay hidden">
@@ -298,26 +318,26 @@
 
         <div id="window-hangman" class="window hidden app-medium" data-app="hangman">
             <div class="window-header">
-                <span><i class="fas fa-skull"></i> Decodificador</span>
+                <span><i class="fas fa-skull"></i> Decodificador Anime</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('hangman')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-hangman')"></button>
                     <button class="win-btn close-btn" onclick="closeApp('hangman')"></button>
                 </div>
             </div>
-            <div class="window-content hangman-bg" style="position:relative;">
+            <div class="window-content hangman-bg" style="position:relative; overflow-y: auto;">
                 <canvas id="hangman-canvas" width="200" height="200" style="margin-bottom: 10px; max-width: 150px;"></canvas>
                 <div id="hangman-word" class="hangman-word-display" style="font-size: 1.8rem;"></div>
-                <div id="hangman-hint-text" style="color:var(--neon-yellow); font-size:14px; margin-bottom:5px; font-style:italic; text-align:center;"></div>
+                <div id="hangman-hint-text" style="color:var(--neon-yellow); font-size:14px; margin-bottom:5px; font-style:italic; text-align:center; padding: 0 15px;"></div>
                 <div id="hangman-attempts" style="color: var(--neon-pink); font-size: 14px; margin-bottom: 10px;">Fallos: 0/6</div>
                 <div id="hangman-letters" class="hangman-keyboard"></div>
                 <div style="display:flex; gap:10px; margin-top: 15px;">
-                    <button id="hangman-hint-btn" class="neon-btn-small" style="border-color:var(--neon-yellow); color:var(--neon-yellow);">Pista</button>
-                    <button id="hangman-reset" class="neon-btn-small">Nueva Secuencia</button>
+                    <button id="hangman-hint-btn" class="neon-btn-small" style="border-color:var(--neon-yellow); color:var(--neon-yellow);">Dar Pista (Letra)</button>
                 </div>
                 <div id="hangman-overlay" class="game-overlay hidden">
                     <h2 id="hangman-result-title">RESULTADO</h2>
                     <p id="hangman-result-word"></p>
+                    <button id="hangman-overlay-reset" class="neon-btn" style="margin-top:20px;">Jugar de Nuevo</button>
                 </div>
             </div>
         </div>
@@ -331,12 +351,12 @@
                     <button class="win-btn close-btn" onclick="closeApp('trash')"></button>
                 </div>
             </div>
-            <div class="window-content" style="background: #f0f0f0; padding: 15px;">
+            <div class="window-content" style="background: #f0f0f0; padding: 15px; display: flex; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; margin-bottom:10px; align-items: center;">
-                    <span style="color: #333; font-weight: bold;">Elementos: <span id="trash-count">0</span></span>
-                    <button id="empty-trash" style="background:#ff5f56; color:white; border:none; padding:8px 12px; border-radius:4px;">Vaciar Todo</button>
+                    <span style="color: #333; font-weight: bold;">Elementos en basura: <span id="trash-count">0</span></span>
+                    <span style="font-size: 12px; color: #666;">Toca para restaurar</span>
                 </div>
-                <div id="trash-items" style="display: flex; flex-wrap: wrap; gap: 20px; overflow-y: auto; height: 100%; color: #333;"></div>
+                <div id="trash-items" style="display: flex; flex-wrap: wrap; gap: 20px; overflow-y: auto; flex-grow: 1; color: #333; align-content: flex-start;"></div>
             </div>
         </div>
 
@@ -368,15 +388,14 @@
         <ul id="ctx-desktop-options">
             <li id="ctx-new-file"><i class="fas fa-file"></i> Nueva Nota</li>
             <li id="ctx-new-folder"><i class="fas fa-folder"></i> Nueva Carpeta</li>
-            <li id="ctx-wallpaper"><i class="fas fa-image"></i> Fondo Aleatorio</li>
+            <li id="ctx-wallpaper"><i class="fas fa-image"></i> Cambiar Fondo Aleatorio</li>
         </ul>
         <ul id="ctx-icon-options" class="hidden">
             <li id="ctx-rename"><i class="fas fa-edit"></i> Renombrar</li>
-            <li id="ctx-delete"><i class="fas fa-trash"></i> Eliminar</li>
+            <li id="ctx-delete"><i class="fas fa-trash"></i> Mover a Papelera</li>
         </ul>
     </div>
     <div id="toast" class="toast hidden">Mensaje</div>
-    <div id="window-preview" class="window-preview hidden"></div>
 
     <script src="core.js"></script>
     <script src="apps.js"></script>
