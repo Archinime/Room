@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OS Virtual · Edición Definitiva Mobile</title>
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>OS Virtual · Edición Definitiva PC-Mode</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -29,10 +29,10 @@
             </div>
             <div class="window-content" style="padding: 0; display: flex; flex-direction: column;">
                 <div style="display: flex; padding: 8px; background: #f0f0f0; gap: 5px;">
-                    <input type="text" id="browser-url" placeholder="Buscar URL o término..." value="https://archinime.github.io/-Archinime-/index.html" style="flex:1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px;">
+                    <input type="text" id="browser-url" placeholder="Buscar URL o término..." value="https://archinime.github.io/-Archinime-" style="flex:1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px;">
                     <button onclick="navigateBrowser()" style="padding: 8px 15px; border-radius: 6px; border: none; background: var(--accent-color); color: #000; cursor: pointer; font-weight: bold;">Ir</button>
                 </div>
-                <iframe id="browser-frame" src="https://archinime.github.io/-Archinime-/index.html" style="width:100%; height:100%; border:none; flex-grow: 1;"></iframe>
+                <iframe id="browser-frame" src="https://archinime.github.io/-Archinime-" style="width:100%; height:100%; border:none; flex-grow: 1;"></iframe>
             </div>
         </div>
 
@@ -78,7 +78,7 @@
                 </div>
             </div>
             <div class="window-content terminal-bg">
-                <div id="term-output">OS_VIRTUAL Premium Mobile<br>Escribe 'ayuda' para ver comandos.</div>
+                <div id="term-output">OS_VIRTUAL Premium<br>Escribe 'ayuda' para ver comandos.</div>
                 <div class="term-input-line">
                     <span style="color: var(--accent-color);">root@sistema:~$</span>
                     <input type="text" id="term-input" autocomplete="off" onkeypress="handleTerminal(event)">
@@ -125,10 +125,11 @@
                     <div class="color-swatch" style="background: #FFBD2E;" onclick="changeTheme('#FFBD2E')"></div>
                     <div class="color-swatch" style="background: #FF5F56;" onclick="changeTheme('#FF5F56')"></div>
                 </div>
+                
                 <hr>
                 <p><strong>Fondo de escritorio</strong></p>
                 <div style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px;">
-                    <button class="neon-btn-small" onclick="cyclePremiumWallpapers()"><i class="fas fa-image"></i> Cambiar Fondo Aleatorio</button>
+                    <button class="neon-btn-small" onclick="cyclePremiumWallpapers()"><i class="fas fa-image"></i> Cambiar Fondo Mágico</button>
                     <button class="neon-btn-small" onclick="setWallpaper('particles')">Partículas Interactivas</button>
                     <button class="neon-btn-small" onclick="setWallpaperFromPrompt()">Cargar por URL</button>
                     <label class="neon-btn-small" style="cursor:pointer; text-align:center;">
@@ -136,9 +137,6 @@
                         <input type="file" id="local-wallpaper-upload" accept="image/*" style="display:none;" onchange="uploadLocalWallpaper(event)">
                     </label>
                 </div>
-                <p style="font-size: 12px; margin-top: 10px;">Catálogo de Fondos Premium:</p>
-                <div id="wallpaper-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 10px; max-height: 200px; overflow-y: auto; padding-right: 5px;"></div>
-                
                 <hr>
                 <p><strong>Fondo de perfil</strong></p>
                 <div id="profile-preview" style="width: 80px; height: 80px; border-radius: 50%; background: #ccc; margin: 10px auto; background-size: cover; background-position: center;"></div>
@@ -328,16 +326,16 @@
             <div class="window-content hangman-bg" style="position:relative; overflow-y: auto;">
                 <canvas id="hangman-canvas" width="200" height="200" style="margin-bottom: 10px; max-width: 150px;"></canvas>
                 <div id="hangman-word" class="hangman-word-display" style="font-size: 1.8rem;"></div>
-                <div id="hangman-hint-text" style="color:var(--neon-yellow); font-size:14px; margin-bottom:5px; font-style:italic; text-align:center; padding: 0 15px;"></div>
+                <div id="hangman-hint-text" style="color:var(--neon-yellow); font-size:14px; margin-bottom:5px; font-style:italic; text-align:center;"></div>
                 <div id="hangman-attempts" style="color: var(--neon-pink); font-size: 14px; margin-bottom: 10px;">Fallos: 0/6</div>
                 <div id="hangman-letters" class="hangman-keyboard"></div>
                 <div style="display:flex; gap:10px; margin-top: 15px;">
-                    <button id="hangman-hint-btn" class="neon-btn-small" style="border-color:var(--neon-yellow); color:var(--neon-yellow);">Dar Pista (Letra)</button>
+                    <button id="hangman-hint-btn" class="neon-btn-small" style="border-color:var(--neon-yellow); color:var(--neon-yellow);">Pista</button>
+                    <button id="hangman-reset" class="neon-btn-small">Nueva Secuencia</button>
                 </div>
                 <div id="hangman-overlay" class="game-overlay hidden">
                     <h2 id="hangman-result-title">RESULTADO</h2>
                     <p id="hangman-result-word"></p>
-                    <button id="hangman-overlay-reset" class="neon-btn" style="margin-top:20px;">Jugar de Nuevo</button>
                 </div>
             </div>
         </div>
@@ -388,7 +386,7 @@
         <ul id="ctx-desktop-options">
             <li id="ctx-new-file"><i class="fas fa-file"></i> Nueva Nota</li>
             <li id="ctx-new-folder"><i class="fas fa-folder"></i> Nueva Carpeta</li>
-            <li id="ctx-wallpaper"><i class="fas fa-image"></i> Cambiar Fondo Aleatorio</li>
+            <li id="ctx-wallpaper"><i class="fas fa-image"></i> Cambiar Fondo Mágico</li>
         </ul>
         <ul id="ctx-icon-options" class="hidden">
             <li id="ctx-rename"><i class="fas fa-edit"></i> Renombrar</li>

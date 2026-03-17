@@ -19,34 +19,33 @@ let particlesActive = true;
 
 // 25 FONDOS IMPRESIONANTES Y DIVERSOS (Sin repetidos)
 const premiumWallpapers = [
-    'https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=1920&q=80', // Vaporwave retro
-    'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1920&q=80', // Placa madre (Tech)
-    'https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=1920&q=80', // Código matrix
-    'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=1920&q=80', // Ciudad Sci-fi
-    'https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?auto=format&fit=crop&w=1920&q=80', // Líquido oscuro abstracto
-    'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1920&q=80', // Letreros Neon Tokyo
-    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1920&q=80', // Nodos abstractos azules
-    'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=1920&q=80', // Montaña geométrica
-    'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1920&q=80', // Neon verde/Dinero
-    'https://images.unsplash.com/photo-1504333638930-c8787321efa0?auto=format&fit=crop&w=1920&q=80', // Abstracto oscuro elegante
-    'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?auto=format&fit=crop&w=1920&q=80', // Render 3D Neon
-    'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=1920&q=80', // Gradiente Suave
-    'https://images.unsplash.com/photo-1506744626753-1fa44f1c1fcc?auto=format&fit=crop&w=1920&q=80', // Paisaje Naturaleza HD
-    'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1920&q=80', // Espacio y Planeta Tierra
-    'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1920&q=80', // Geometría tech
-    'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&w=1920&q=80', // Gradiente líquido mágico
-    'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1920&q=80', // Retro gaming station
-    'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1920&q=80', // Neon luces de ciudad lluviosa
-    'https://images.unsplash.com/photo-1604871000636-074fa5117945?auto=format&fit=crop&w=1920&q=80', // Aesthetic holográfico
-    'https://images.unsplash.com/photo-1482686115713-0fbcaced6e28?auto=format&fit=crop&w=1920&q=80', // Galaxia morada
-    'https://images.unsplash.com/photo-1608501078713-8e445a709b39?auto=format&fit=crop&w=1920&q=80', // Vaporwave montañas
-    'https://images.unsplash.com/photo-1552083375-1447ce886485?auto=format&fit=crop&w=1920&q=80', // Hojas tropicales neón
-    'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1920&q=80', // Noche estrellada minimalista
-    'https://images.unsplash.com/photo-1523821741446-edb2b68bb7a0?auto=format&fit=crop&w=1920&q=80', // Formas abstractas 3D pasteles
-    'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1920&q=80'  // Glitch art
+    'https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1504333638930-c8787321efa0?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1506744626753-1fa44f1c1fcc?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1604871000636-074fa5117945?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1482686115713-0fbcaced6e28?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1608501078713-8e445a709b39?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1552083375-1447ce886485?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1523821741446-edb2b68bb7a0?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1920&q=80'
 ];
 let currentWallpaperIndex = 0;
-
 // --- SISTEMA DE AUDIO SFX ---
 let audioCtxConfigured = false;
 let audioCtx;
@@ -65,20 +64,15 @@ function playSound(type) {
     gain.connect(audioCtx.destination);
     const now = audioCtx.currentTime;
     
-    if (type === 'open') { osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(1200, now+0.1); gain.gain.setValueAtTime(0.05, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now+0.1); osc.start(now); osc.stop(now+0.1);
-    } else if (type === 'eat') { osc.type = 'square'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(600, now+0.1); gain.gain.setValueAtTime(0.05, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now+0.1); osc.start(now); osc.stop(now+0.1); 
-    } else if (type === 'die') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(50, now+0.5); gain.gain.setValueAtTime(0.1, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now+0.5); osc.start(now); osc.stop(now+0.5);
-    } else if (type === 'hit') { osc.type = 'square'; osc.frequency.setValueAtTime(800, now); gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.01, now+0.05);
-        osc.start(now); osc.stop(now+0.05); 
-    } else if (type === 'win') { osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.setValueAtTime(500, now+0.1); osc.frequency.setValueAtTime(600, now+0.2); gain.gain.setValueAtTime(0.1, now);
-        gain.gain.linearRampToValueAtTime(0, now+0.4); osc.start(now); osc.stop(now+0.4); }
+    if (type === 'open') { osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(1200, now+0.1); gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.01, now+0.1); osc.start(now); osc.stop(now+0.1);
+    } else if (type === 'eat') { osc.type = 'square'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(600, now+0.1); gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.01, now+0.1); osc.start(now); osc.stop(now+0.1); 
+    } else if (type === 'die') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(50, now+0.5); gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now+0.5); osc.start(now); osc.stop(now+0.5);
+    } else if (type === 'hit') { osc.type = 'square'; osc.frequency.setValueAtTime(800, now); gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.01, now+0.05); osc.start(now); osc.stop(now+0.05); 
+    } else if (type === 'win') { osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.setValueAtTime(500, now+0.1); osc.frequency.setValueAtTime(600, now+0.2); gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now+0.4); osc.start(now); osc.stop(now+0.4); }
 }
 
-// --- INICIALIZACIÓN ---
-window.onload = () => {
+// --- INICIALIZACIÓN INMEDIATA ---
+document.addEventListener('DOMContentLoaded', () => {
     const savedBg = localStorage.getItem('customBg');
     if(savedBg) { 
         document.body.style.backgroundImage = savedBg; 
@@ -93,7 +87,6 @@ window.onload = () => {
     initGallery(); initMusicPlayer();
     renderTTT(); renderFiles();
     renderTrash();
-    renderWallpaperGrid(); // Carga la cuadrícula de fondos
     loadWindowStates(); setupEventListeners();
     initPong(); initBreakout(); initMemory(); initHangman(); initSnake();
     loadProfilePicture(); showToast('Sistema inicializado...');
@@ -101,7 +94,7 @@ window.onload = () => {
     
     updateClock();
     setInterval(updateClock, 1000);
-};
+});
 
 // --- GESTIÓN DE VENTANAS Y ESTADO ---
 function updateClock() {
@@ -115,7 +108,7 @@ function loadWindowStates() {
         const states = JSON.parse(saved);
         for (let [id, state] of Object.entries(states)) {
             const win = document.getElementById(id);
-            if (win && window.innerWidth > 768) { 
+            if (win) { 
                 win.style.top = state.top;
                 win.style.left = state.left; win.style.width = state.width; win.style.height = state.height; if (state.maximized) maximizeApp(id.replace('window-',''));
             }
@@ -123,7 +116,6 @@ function loadWindowStates() {
     }
 }
 function saveWindowState(id) {
-    if(window.innerWidth <= 768) return;
     const win = document.getElementById(id);
     if (!win) return;
     const state = { top: win.style.top, left: win.style.left, width: win.style.width, height: win.style.height, maximized: !!maximizedWindows[id] };
@@ -158,7 +150,6 @@ function closeApp(appId) {
 function minimizeApp(appId) { document.getElementById(`window-${appId}`).classList.add('hidden'); const taskItem = document.getElementById(`task-${appId}`);
     if(taskItem) taskItem.classList.remove('active'); }
 function maximizeApp(windowId) {
-    if(window.innerWidth <= 768) return; 
     const realId = windowId.startsWith('window-') ? windowId : `window-${windowId}`;
     const win = document.getElementById(realId);
     if (!maximizedWindows[realId]) {
@@ -178,7 +169,6 @@ function bringToFront(element) {
 
 // Drag de Ventanas
 function startDrag(e, windowId) {
-    if(window.innerWidth <= 768) return;
     if (e.target.classList.contains('win-btn') || e.target.closest('.window-controls')) return;
     const win = document.getElementById(windowId); bringToFront(win);
     if (maximizedWindows[windowId]) maximizeApp(windowId.replace('window-',''));
@@ -216,6 +206,7 @@ function startDrag(e, windowId) {
 }
 document.querySelectorAll('.window-header').forEach(header => { header.addEventListener('mousedown', (e) => startDrag(e, header.parentElement.id)); header.addEventListener('touchstart', (e) => startDrag(e, header.parentElement.id), {passive: false}); });
 
+// --- Mover a la Papelera desde Core ---
 function moveToTrash(iconDiv) {
     trashItems.push({ name: iconDiv.querySelector('.icon-label').innerText, icon: iconDiv.querySelector('.icon-img').innerText, appId: iconDiv.getAttribute('data-appid') });
     localStorage.setItem('trash', JSON.stringify(trashItems));
@@ -243,7 +234,6 @@ function snapIconToGrid(iconDiv, origLeft, origTop) {
     row = Math.max(0, row);
     let finalLeft = (col * GRID_CELL_W) + 10;
     let finalTop = (row * GRID_CELL_H) + 10;
-    
     // Verificar si la casilla destino está ocupada
     let isOccupied = false;
     document.querySelectorAll('.desktop-icon').forEach(otherIcon => {
@@ -255,7 +245,6 @@ function snapIconToGrid(iconDiv, origLeft, origTop) {
             }
         }
     });
-
     if (isOccupied && origLeft !== undefined && origTop !== undefined) {
         // Regresar a su sitio si está ocupado
         iconDiv.style.left = origLeft;
@@ -338,7 +327,6 @@ function saveDesktopIconPositions() {
 document.getElementById('start-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('start-menu').classList.toggle('hidden'); });
 document.addEventListener('click', (e) => { const startMenu = document.getElementById('start-menu'), startBtn = document.getElementById('start-btn'); if (!startMenu.contains(e.target) && !startBtn.contains(e.target)) startMenu.classList.add('hidden'); });
 document.getElementById('start-search').addEventListener('input', function(e) { const query = e.target.value.toLowerCase(); document.querySelectorAll('.start-app-icon').forEach(app => { const name = app.querySelector('span').textContent.toLowerCase(); app.style.display = name.includes(query) ? 'flex' : 'none'; }); });
-
 function initDesktopIcons() {
     const defaultApps = [
         { name: 'Navegador', icon: '🌐', appId: 'browser' }, { name: 'Notas', icon: '📝', appId: 'notes' }, { name: 'Terminal', icon: '💻', appId: 'terminal' },
@@ -352,17 +340,25 @@ function initDesktopIcons() {
         const startAppIcon = document.createElement('div'); startAppIcon.className = 'start-app-icon'; startAppIcon.innerHTML = `<div class="app-icon">${app.icon}</div><span>${app.name}</span>`; startAppIcon.onclick = () => { openApp(app.appId, app.icon); }; startMenuAppsContainer.appendChild(startAppIcon);
     });
     const savedIcons = JSON.parse(localStorage.getItem('desktopIcons') || '[]');
-    let currentIcons = savedIcons.length > 0 ? savedIcons : defaultApps.map((a, i) => ({...a, id: 'icon-'+Date.now()+i, left: (10 + (Math.floor(i/4)*GRID_CELL_W))+'px', top: (120 + ((i%4)*GRID_CELL_H))+'px'}));
-    
+    let currentIcons = savedIcons.length > 0 ?
+    savedIcons : defaultApps.map((a, i) => ({...a, id: 'icon-'+Date.now()+i, left: (10 + (Math.floor(i/4)*GRID_CELL_W))+'px', top: (120 + ((i%4)*GRID_CELL_H))+'px'}));
+    // Crear íconos excluyendo la papelera (porque ya está en el HTML)
     currentIcons.forEach(icon => {
-        if(icon.id !== 'trash-icon') { addDesktopIcon(icon.name, icon.icon, icon.appId, icon.id, icon.left, icon.top, false); }
+        if(icon.id !== 'trash-icon') {
+            addDesktopIcon(icon.name, icon.icon, icon.appId, icon.id, icon.left, icon.top, false);
+        }
     });
-    
+    // Configurar la Papelera
     let trashIcon = document.getElementById('trash-icon');
     if (trashIcon) {
         let trashSaved = savedIcons.find(i => i.id === 'trash-icon');
-        if (trashSaved) { trashIcon.style.left = trashSaved.left; trashIcon.style.top = trashSaved.top; } 
-        else { trashIcon.style.left = '10px'; trashIcon.style.top = '10px'; }
+        if (trashSaved) {
+            trashIcon.style.left = trashSaved.left;
+            trashIcon.style.top = trashSaved.top;
+        } else {
+            trashIcon.style.left = '10px';
+            trashIcon.style.top = '10px';
+        }
         snapIconToGrid(trashIcon);
         
         let tapCountTrash = 0;
@@ -395,34 +391,6 @@ function addDesktopIcon(name, icon, appId, id = 'icon-'+Date.now(), left = '10px
 // --- AJUSTES Y TEMAS ---
 function changeTheme(color) { document.documentElement.style.setProperty('--accent-color', color); showToast('Color sincronizado'); }
 
-function renderWallpaperGrid() {
-    const grid = document.getElementById('wallpaper-grid');
-    if(!grid) return;
-    grid.innerHTML = '';
-    premiumWallpapers.forEach((bg, idx) => {
-        let img = document.createElement('div');
-        img.style.backgroundImage = `url(${bg})`;
-        img.style.backgroundSize = 'cover';
-        img.style.backgroundPosition = 'center';
-        img.style.height = '60px';
-        img.style.borderRadius = '6px';
-        img.style.cursor = 'pointer';
-        img.style.border = currentWallpaperIndex === idx ? '2px solid var(--neon-cyan)' : '2px solid transparent';
-        img.onclick = () => {
-            currentWallpaperIndex = idx;
-            const url = `url(${bg})`;
-            document.body.style.backgroundImage = url;
-            localStorage.setItem('customBg', url);
-            particlesActive = false;
-            let c = document.getElementById('bg-canvas');
-            if(c) c.getContext('2d').clearRect(0,0, window.innerWidth, window.innerHeight);
-            showToast('Fondo Aplicado');
-            renderWallpaperGrid(); // Refrescar los bordes
-        };
-        grid.appendChild(img);
-    });
-}
-
 function setWallpaper(type) {
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
@@ -430,7 +398,8 @@ function setWallpaper(type) {
         document.body.style.backgroundImage = 'none'; 
         localStorage.removeItem('customBg');
         particlesActive = true;
-    } else { 
+    }
+    else { 
         const url = `url("https://images.unsplash.com/photo-1506744626753-1fa44f1c1fcc?auto=format&fit=crop&w=1920&q=80")`;
         document.body.style.backgroundImage = url;
         localStorage.removeItem('customBg'); 
@@ -443,11 +412,12 @@ function setWallpaper(type) {
 function cyclePremiumWallpapers() {
     currentWallpaperIndex = (currentWallpaperIndex + 1) % premiumWallpapers.length;
     const url = `url(${premiumWallpapers[currentWallpaperIndex]})`;
+    
     document.body.style.backgroundImage = url;
     localStorage.setItem('customBg', url);
     particlesActive = false; 
     document.getElementById('bg-canvas').getContext('2d').clearRect(0,0, window.innerWidth, window.innerHeight);
-    renderWallpaperGrid();
+    
     showToast('Fondo Mágico Aplicado');
 }
 
@@ -467,6 +437,7 @@ function uploadLocalWallpaper(e) {
     const file = e.target.files[0];
     if(file) { 
         if(file.size > 20000000) { showToast('Error: Límite ampliado (Max 20MB)'); return; }
+        
         const reader = new FileReader();
         reader.onload = (ev) => { 
             let img = new Image();
@@ -474,10 +445,15 @@ function uploadLocalWallpaper(e) {
                 let canvas = document.createElement('canvas');
                 let max_size = 1920;
                 let width = img.width, height = img.height;
-                if (width > height && width > max_size) { height *= max_size / width; width = max_size; }
-                else if (height > max_size) { width *= max_size / height; height = max_size; }
-                canvas.width = width; canvas.height = height;
-                let ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                if (width > height && width > max_size) { height *= max_size / width; width = max_size;
+                }
+                else if (height > max_size) { width *= max_size / height;
+                height = max_size; }
+                canvas.width = width;
+                canvas.height = height;
+                
+                let ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
                 let dataUrl = canvas.toDataURL('image/jpeg', 0.85);
                 try {
                     const url = `url(${dataUrl})`;
@@ -502,7 +478,10 @@ function loadProfilePicture() { if (profilePicture) document.getElementById('pro
 function toggleMatrix() { const canvas = document.getElementById('matrix-canvas'); matrixEnabled = !matrixEnabled;
     canvas.style.display = matrixEnabled ? 'block' : 'none'; if (matrixEnabled) startMatrix();
     else if (matrixInterval) clearInterval(matrixInterval); }
-function toggleSound() { soundEnabled = !soundEnabled; document.getElementById('sound-status').innerText = soundEnabled ? 'ON' : 'OFF'; showToast(soundEnabled ? 'Sistema de audio activado' : 'Silencio activado'); }
+function toggleSound() { soundEnabled = !soundEnabled;
+    document.getElementById('sound-status').innerText = soundEnabled ? 'ON' : 'OFF';
+    showToast(soundEnabled ? 'Sistema de audio activado' : 'Silencio activado');
+}
 function startMatrix() {
     const canvas = document.getElementById('matrix-canvas');
     const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -513,7 +492,8 @@ function startMatrix() {
         for (let i = 0; i < drops.length; i++) { const text = String.fromCharCode(Math.random() * 128); ctx.fillText(text, i * 20, drops[i] * 20); if (drops[i] * 20 > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++; }
     }, 50);
 }
-function togglePowerSaver() { powerSaver = !powerSaver; document.body.style.filter = powerSaver ? 'brightness(0.5)' : 'brightness(1)'; showToast('Ahorro de energía: ' + (powerSaver ? 'ON' : 'OFF'));}
+function togglePowerSaver() { powerSaver = !powerSaver; document.body.style.filter = powerSaver ? 'brightness(0.5)' : 'brightness(1)';
+    showToast('Ahorro de energía: ' + (powerSaver ? 'ON' : 'OFF'));}
 function checkIdle() {
     let idleTime = 0;
     if(powerSaverTimer) clearInterval(powerSaverTimer);
@@ -531,27 +511,36 @@ window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
 window.addEventListener('touchmove', (e) => { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; }, {passive: true});
 window.addEventListener('mouseout', () => { mouse.x = undefined; mouse.y = undefined; });
 window.addEventListener('touchend', () => { mouse.x = undefined; mouse.y = undefined; });
+
 class Particle { 
-    constructor(x, y, dx, dy, size, color) { this.x = x; this.y = y; this.dx = dx; this.dy = dy; this.size = size; this.color = color; } 
+    constructor(x, y, dx, dy, size, color) { this.x = x; this.y = y;
+        this.dx = dx; this.dy = dy; this.size = size; this.color = color;
+    } 
     draw() { 
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false); const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim(); ctx.fillStyle = this.color;
         if(mouse.x != undefined && mouse.y != undefined){ 
-            let dx = mouse.x - this.x; let dy = mouse.y - this.y; let distance = Math.sqrt(dx * dx + dy * dy);
-            if(distance < 80) { ctx.fillStyle = accent; this.size = Math.min(3, this.size + 0.5); } else { this.size = Math.max(0.5, this.size - 0.1); } 
+            let dx = mouse.x - this.x;
+            let dy = mouse.y - this.y; let distance = Math.sqrt(dx * dx + dy * dy);
+            if(distance < 80) { ctx.fillStyle = accent; this.size = Math.min(3, this.size + 0.5);
+            } else { this.size = Math.max(0.5, this.size - 0.1); } 
         } 
         ctx.fill();
     } 
     update() { 
-        if (this.x > canvas.width || this.x < 0) this.dx = -this.dx; if (this.y > canvas.height || this.y < 0) this.dy = -this.dy;
+        if (this.x > canvas.width || this.x < 0) this.dx = -this.dx;
+        if (this.y > canvas.height || this.y < 0) this.dy = -this.dy;
         if(mouse.x != undefined && mouse.y != undefined){ 
-            let dx = mouse.x - this.x; let dy = mouse.y - this.y; let distance = Math.sqrt(dx * dx + dy * dy);
+            let dx = mouse.x - this.x;
+            let dy = mouse.y - this.y; let distance = Math.sqrt(dx * dx + dy * dy);
             if (distance < mouse.radius) { 
-                const forceDirectionX = dx / distance; const forceDirectionY = dy / distance; const force = (mouse.radius - distance) / mouse.radius;
+                const forceDirectionX = dx / distance;
+                const forceDirectionY = dy / distance; const force = (mouse.radius - distance) / mouse.radius;
                 this.x -= forceDirectionX * force * 3; this.y -= forceDirectionY * force * 3;
             } 
         } 
-        this.x += this.dx; this.y += this.dy; this.draw();
+        this.x += this.dx;
+        this.y += this.dy; this.draw();
     } 
 }
 
@@ -560,7 +549,8 @@ function initParticles() {
     let numberOfParticles = (canvas.width * canvas.height) / 8000;
     for (let i = 0; i < numberOfParticles; i++) { 
         let size = Math.random() * 2 + 0.5;
-        let x = Math.random() * (innerWidth - size * 2) + size; let y = Math.random() * (innerHeight - size * 2) + size; let dx = (Math.random() - 0.5) * 1.5;
+        let x = Math.random() * (innerWidth - size * 2) + size;
+        let y = Math.random() * (innerHeight - size * 2) + size; let dx = (Math.random() - 0.5) * 1.5;
         let dy = (Math.random() - 0.5) * 1.5; let color = 'rgba(255, 255, 255, 0.2)';
         particlesArray.push(new Particle(x, y, dx, dy, size, color)); 
     } 

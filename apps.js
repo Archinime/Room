@@ -35,7 +35,9 @@ function calcPress(val) {
 
 function navigateBrowser() { 
     let url = document.getElementById('browser-url').value;
-    if (!url.startsWith('http')) url = 'https://lite.duckduckgo.com/lite/?q=' + encodeURIComponent(url);
+    if (!url.startsWith('http')) {
+        url = 'https://www.bing.com/search?q=' + encodeURIComponent(url);
+    }
     document.getElementById('browser-frame').src = url;
 }
 
@@ -47,29 +49,41 @@ function handleTerminal(e) {
         const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
         let response = `<div><span style="color:${accent}">root@sistema:${currentFileDir}$</span> ${fullCmd}</div>`;
         switch(cmd) {
-            case 'ayuda': response += `<div style='color:${accent}'>Comandos: ayuda, limpiar, fecha, sistema, ls, cd, mkdir, touch, rm, ddg, juegos</div>`; break;
+            case 'ayuda': response += `<div style='color:${accent}'>Comandos: ayuda, limpiar, fecha, sistema, ls, cd, mkdir, touch, rm, ddg, juegos</div>`;
+                break;
             case 'limpiar': case 'clear': outputEl.innerHTML = ""; inputEl.value = ""; return;
             case 'fecha': response += `<div>${new Date().toLocaleString()}</div>`; break;
-            case 'sistema': response += `<div style='color:#bc13fe'>OS VIRTUAL CYBERPUNK EDITION (MOBILE READY)</div>`; break;
-            case 'ddg': if (args[1]) { openApp('browser', '🌐'); setTimeout(() => { document.getElementById('browser-url').value = 'https://lite.duckduckgo.com/lite/?q=' + args.slice(1).join('+'); navigateBrowser(); }, 100); response += `<div>Iniciando script de búsqueda...</div>`; } break;
+            case 'sistema': response += `<div style='color:#bc13fe'>OS VIRTUAL CYBERPUNK EDITION (PC MODE)</div>`; break;
+            case 'ddg': if (args[1]) { openApp('browser', '🌐');
+                setTimeout(() => { document.getElementById('browser-url').value = 'https://www.bing.com/search?q=' + args.slice(1).join('+'); navigateBrowser(); }, 100); response += `<div>Iniciando script de búsqueda por Bing...</div>`; } break;
             case 'juegos': response += `<div>Módulos de ocio: ttt, snake, pong, breakout, memory, hangman</div>`; break;
             case 'ls': 
                 const dirContent = listDir(currentFileDir);
-                if (dirContent) { let list = Object.entries(dirContent).map(([name, info]) => info.type === 'dir' ? `<span style="color:#00f3ff;">${name}/</span>` : name).join('  '); response += `<div>${list}</div>`; } else response += `<div>Error 404</div>`; 
+                if (dirContent) { let list = Object.entries(dirContent).map(([name, info]) => info.type === 'dir' ? `<span style="color:#00f3ff;">${name}/</span>` : name).join('  ');
+                response += `<div>${list}</div>`; } else response += `<div>Error 404</div>`; 
                 break;
             case 'cd': 
                 if (!args[1] || args[1] === '~') currentFileDir = '/';
-                else if (args[1] === '..') { let parts = currentFileDir.split('/').filter(p => p); parts.pop(); currentFileDir = '/' + parts.join('/'); } 
-                else { let newPath = currentFileDir === '/' ? '/' + args[1] : currentFileDir + '/' + args[1]; if (listDir(newPath) !== null) currentFileDir = newPath; else response += `<div>Directorio fantasma</div>`; } 
+                else if (args[1] === '..') { let parts = currentFileDir.split('/').filter(p => p); parts.pop(); currentFileDir = '/' + parts.join('/');
+                } 
+                else { let newPath = currentFileDir === '/' ?
+                '/' + args[1] : currentFileDir + '/' + args[1]; if (listDir(newPath) !== null) currentFileDir = newPath;
+                else response += `<div>Directorio fantasma</div>`; } 
                 break;
             case 'mkdir': 
-                if (args[1]) { let parent = listDir(currentFileDir); if (parent) { parent[args[1]] = { type: 'dir', content: {} }; response += `<div>Nodo creado</div>`; saveFS(); renderFiles(); } } 
+                if (args[1]) { let parent = listDir(currentFileDir);
+                if (parent) { parent[args[1]] = { type: 'dir', content: {} }; response += `<div>Nodo creado</div>`; saveFS(); renderFiles();
+                } } 
                 break;
             case 'touch': 
-                if (args[1]) { let parent = listDir(currentFileDir); if (parent) { parent[args[1]] = { type: 'file', content: '' }; response += `<div>Archivo generado</div>`; saveFS(); renderFiles(); } } 
+                if (args[1]) { let parent = listDir(currentFileDir);
+                if (parent) { parent[args[1]] = { type: 'file', content: '' }; response += `<div>Archivo generado</div>`; saveFS(); renderFiles();
+                } } 
                 break;
             case 'rm': 
-                if (args[1]) { let parent = listDir(currentFileDir); if (parent && parent[args[1]]) { delete parent[args[1]]; response += `<div>Elemento purgado</div>`; saveFS(); renderFiles(); } } 
+                if (args[1]) { let parent = listDir(currentFileDir);
+                if (parent && parent[args[1]]) { delete parent[args[1]]; response += `<div>Elemento purgado</div>`; saveFS(); renderFiles();
+                } } 
                 break;
             default: if (cmd !== '') response += `<div style='color:#ff0055'>Comando no reconocido: ${cmd}</div>`;
         }
@@ -86,7 +100,8 @@ function listDir(path) {
     if(path === '/') return fileSystem['/'].content;
     let parts = path.split('/').filter(p => p);
     let current = fileSystem['/'];
-    for (let p of parts) { if (current.content && current.content[p] && current.content[p].type === 'dir') current = current.content[p]; else return null; } 
+    for (let p of parts) { if (current.content && current.content[p] && current.content[p].type === 'dir') current = current.content[p];
+    else return null; } 
     return current.content;
 }
 
@@ -114,11 +129,13 @@ function uiCreateFile() {
     }
 }
 
-let galleryImagesList = JSON.parse(localStorage.getItem('myOS_gallery')) || [
+let galleryImagesList = JSON.parse(localStorage.getItem('myOS_gallery')) ||
+[
     'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=300',
     'https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=300',
     'https://images.unsplash.com/photo-1511497584788-876760111969?w=300'
 ];
+
 function initGallery() { 
     const gallery = document.getElementById('gallery-grid'); if (!gallery) return; 
     gallery.innerHTML = '';
@@ -141,8 +158,10 @@ function uploadGalleryImage(e) {
             img.onload = function() {
                 let canvas = document.createElement('canvas');
                 let max_size = 1080; let width = img.width, height = img.height;
-                if (width > height && width > max_size) { height *= max_size / width; width = max_size; } else if (height > max_size) { width *= max_size / height; height = max_size; }
-                canvas.width = width; canvas.height = height;
+                if (width > height && width > max_size) { height *= max_size / width; width = max_size;
+                } else if (height > max_size) { width *= max_size / height; height = max_size; }
+                canvas.width = width;
+                canvas.height = height;
                 let ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
                 let dataUrl = canvas.toDataURL('image/jpeg', 0.8);
                 try {
@@ -196,37 +215,19 @@ function renderFiles() {
     for (let [name, info] of Object.entries(dirContent)) { 
         const item = document.createElement('div');
         item.className = 'file-item';
-        
-        // Botón de eliminación definitiva
-        const delBtn = document.createElement('button');
-        delBtn.className = 'delete-btn';
-        delBtn.innerHTML = '<i class="fas fa-times"></i>';
-        delBtn.onclick = (e) => {
-            e.stopPropagation();
-            if(confirm(`¿Deseas ELIMINAR DEFINITIVAMENTE "${name}" del explorador?`)) {
-                let parent = listDir(currentFileDir);
-                if(parent && parent[name]) {
-                    delete parent[name];
-                    saveFS();
-                    renderFiles();
-                    showToast(`Eliminado: ${name}`);
-                }
-            }
-        };
-
         item.innerHTML = `<div class="file-icon">${info.type === 'dir' ? '📁' : '📄'}</div><div class="file-name">${name}</div>`;
-        item.appendChild(delBtn);
-
-        item.onclick = (e) => { 
-            if(e.target.closest('.delete-btn')) return; // Ignorar si clickeó eliminar
+        item.onclick = () => { 
             let tapCount = item.getAttribute('data-tap') || 0; 
             tapCount++; item.setAttribute('data-tap', tapCount);
             if(tapCount == 1) { setTimeout(()=>item.setAttribute('data-tap', 0), 400); }
             else if(tapCount == 2) {
-                if (info.type === 'dir') { currentFileDir = currentFileDir === '/' ? '/' + name : currentFileDir + '/' + name; renderFiles(); } 
+                if (info.type === 'dir') { currentFileDir = currentFileDir === '/' ?
+                '/' + name : currentFileDir + '/' + name; renderFiles();
+                } 
                 else { 
                     if (name.endsWith('.txt')) { 
-                        currentNotePath = currentFileDir === '/' ? '/' + name : currentFileDir + '/' + name;
+                        currentNotePath = currentFileDir === '/' ?
+                        '/' + name : currentFileDir + '/' + name;
                         document.getElementById('note-current-file').innerText = `(${name})`;
                         openApp('notes', '📝');
                         setTimeout(() => { document.getElementById('notepad-text').value = info.content || ''; }, 100); 
@@ -244,6 +245,7 @@ let defaultPlaylist = [ { title: 'Plants vs Zombies', src: 'pvz.mp3' }, { title:
 let savedMusic = JSON.parse(localStorage.getItem('myOS_music') || '[]');
 let playlist = [...defaultPlaylist, ...savedMusic];
 let currentSongIndex = 0, audio = document.getElementById('audio-player'), playPauseBtn = document.getElementById('play-pause-btn'), playlistEl = document.getElementById('playlist'), visualizerCanvas = document.getElementById('visualizer'), audioPlayerCtx, analyser, source;
+
 function initMusicPlayer() { 
     if (!playlistEl) return; playlistEl.innerHTML = '';
     playlist.forEach((song, idx) => { let li = document.createElement('li'); li.innerHTML = `<i class="fas fa-music"></i> ${song.title}`; li.onclick = () => playSong(idx); playlistEl.appendChild(li); });
@@ -302,8 +304,10 @@ function playSong(idx) {
 }
 
 function togglePlay() { 
-    if (audio.paused) { audio.play(); playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>'; } 
-    else { audio.pause(); playPauseBtn.innerHTML = '<i class="fas fa-play"></i>'; } 
+    if (audio.paused) { audio.play(); playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    } 
+    else { audio.pause(); playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    } 
 }
 
 function prevSong() { currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length; playSong(currentSongIndex); }
