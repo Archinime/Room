@@ -2,29 +2,25 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>OS Virtual · Edición Definitiva</title>
-    <link rel="stylesheet" href="styles_pc.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OS Virtual · Edición Definitiva Mobile</title>
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
-    <canvas id="matrix-canvas" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:-9; pointer-events:none; display:none;"></canvas>
+    <canvas id="matrix-canvas"></canvas>
 
-    <div id="desktop" oncontextmenu="showContextMenu(event); return false;">
-        <!-- Iconos del escritorio -->
-        <div class="desktop-icons-container" id="desktop-icons"></div>
-
-        <!-- Papelera -->
-        <div class="desktop-icon" id="trash-icon" ondblclick="openApp('trash', '🗑️')">
-            <div class="icon-img">🗑️</div><span>Papelera</span>
+    <div id="desktop" oncontextmenu="showContextMenu(event, 'desktop'); return false;">
+        <div class="desktop-icons-container" id="desktop-icons">
+            <div class="desktop-icon" id="trash-icon" data-appid="trash" style="left: 20px; top: 20px;">
+                <div class="icon-img">🗑️</div><span class="icon-label">Papelera</span>
+            </div>
         </div>
 
-        <!-- VENTANAS (APPS) -->
-        <!-- Navegador mejorado -->
         <div id="window-browser" class="window hidden" data-app="browser">
-            <div class="window-header" onmousedown="startDrag(event, 'window-browser')">
-                <span><i class="fas fa-globe" style="margin-right: 8px;"></i>Navegador Web</span>
+            <div class="window-header">
+                <span><i class="fas fa-globe"></i> Navegador Web</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('browser')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-browser')"></button>
@@ -33,17 +29,16 @@
             </div>
             <div class="window-content" style="padding: 0; display: flex; flex-direction: column;">
                 <div style="display: flex; padding: 8px; background: #f0f0f0; gap: 5px;">
-                    <input type="text" id="browser-url" placeholder="Buscar en Google o escribir URL" value="https://www.google.com" style="flex:1; padding: 5px;">
-                    <button onclick="navigateBrowser()">Ir</button>
+                    <input type="text" id="browser-url" placeholder="Buscar URL..." value="https://www.google.com" style="flex:1; padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
+                    <button onclick="navigateBrowser()" style="padding: 5px 15px; border-radius: 4px; border: none; background: var(--accent-color); color: #000; cursor: pointer;">Ir</button>
                 </div>
                 <iframe id="browser-frame" src="https://www.google.com/webhp?igu=1" style="width:100%; height:100%; border:none;"></iframe>
             </div>
         </div>
 
-        <!-- Bloc de notas -->
         <div id="window-notes" class="window hidden" data-app="notes">
-            <div class="window-header" onmousedown="startDrag(event, 'window-notes')">
-                <span><i class="fas fa-pen" style="margin-right: 8px;"></i>Bloc de Notas</span>
+            <div class="window-header">
+                <span><i class="fas fa-pen"></i> Bloc de Notas</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('notes')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-notes')"></button>
@@ -55,10 +50,9 @@
             </div>
         </div>
 
-        <!-- Calculadora -->
-        <div id="window-calc" class="window hidden" style="width: 320px; height: 440px; min-width: 300px; min-height: 400px;" data-app="calc">
-            <div class="window-header" onmousedown="startDrag(event, 'window-calc')">
-                <span><i class="fas fa-calculator" style="margin-right: 8px;"></i>Calculadora</span>
+        <div id="window-calc" class="window hidden app-small" data-app="calc">
+            <div class="window-header">
+                <span><i class="fas fa-calculator"></i> Calculadora</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('calc')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-calc')"></button>
@@ -74,10 +68,9 @@
             </div>
         </div>
 
-        <!-- Terminal mejorada -->
-        <div id="window-terminal" class="window hidden" style="width: 650px; height: 450px;" data-app="terminal">
-            <div class="window-header" onmousedown="startDrag(event, 'window-terminal')">
-                <span><i class="fas fa-terminal" style="margin-right: 8px;"></i>Terminal</span>
+        <div id="window-terminal" class="window hidden app-medium" data-app="terminal">
+            <div class="window-header">
+                <span><i class="fas fa-terminal"></i> Terminal</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('terminal')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-terminal')"></button>
@@ -85,7 +78,7 @@
                 </div>
             </div>
             <div class="window-content terminal-bg">
-                <div id="term-output">OS_VIRTUAL Premium v8.0<br>Escribe 'ayuda' para ver los comandos.</div>
+                <div id="term-output">OS_VIRTUAL Premium Mobile<br>Escribe 'ayuda' para ver comandos.</div>
                 <div class="term-input-line">
                     <span style="color: var(--accent-color);">root@sistema:~$</span>
                     <input type="text" id="term-input" autocomplete="off" onkeypress="handleTerminal(event)">
@@ -93,10 +86,9 @@
             </div>
         </div>
 
-        <!-- Galería -->
-        <div id="window-fotos" class="window hidden" style="width: 700px; height: 500px;" data-app="fotos">
-            <div class="window-header" onmousedown="startDrag(event, 'window-fotos')">
-                <span><i class="fas fa-images" style="margin-right: 8px;"></i>Galería</span>
+        <div id="window-fotos" class="window hidden app-large" data-app="fotos">
+            <div class="window-header">
+                <span><i class="fas fa-images"></i> Galería</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('fotos')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-fotos')"></button>
@@ -106,10 +98,9 @@
             <div class="window-content gallery-grid" id="gallery-grid"></div>
         </div>
 
-        <!-- Ajustes con más opciones -->
-        <div id="window-ajustes" class="window hidden" style="width: 400px; height: 550px;" data-app="ajustes">
-            <div class="window-header" onmousedown="startDrag(event, 'window-ajustes')">
-                <span><i class="fas fa-cog" style="margin-right: 8px;"></i>Ajustes</span>
+        <div id="window-ajustes" class="window hidden app-medium" data-app="ajustes">
+            <div class="window-header">
+                <span><i class="fas fa-cog"></i> Ajustes</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('ajustes')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-ajustes')"></button>
@@ -120,40 +111,41 @@
                 <h3>Personalización</h3>
                 <p>Color de acento:</p>
                 <div class="color-picker">
-                    <div class="color-swatch" style="background: #00C9FF;" onclick="changeTheme('#00C9FF')"></div>
-                    <div class="color-swatch" style="background: #FF5F56;" onclick="changeTheme('#FF5F56')"></div>
+                    <div class="color-swatch" style="background: #00f3ff;" onclick="changeTheme('#00f3ff')"></div>
+                    <div class="color-swatch" style="background: #bc13fe;" onclick="changeTheme('#bc13fe')"></div>
+                    <div class="color-swatch" style="background: #ff0055;" onclick="changeTheme('#ff0055')"></div>
                     <div class="color-swatch" style="background: #34C759;" onclick="changeTheme('#34C759')"></div>
                     <div class="color-swatch" style="background: #FFBD2E;" onclick="changeTheme('#FFBD2E')"></div>
-                    <div class="color-swatch" style="background: #B145E9;" onclick="changeTheme('#B145E9')"></div>
-                    <div class="color-swatch" style="background: #FF3366;" onclick="changeTheme('#FF3366')"></div>
+                    <div class="color-swatch" style="background: #FF5F56;" onclick="changeTheme('#FF5F56')"></div>
                 </div>
                 <hr>
                 <p><strong>Fondo de escritorio</strong></p>
-                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                    <button onclick="setWallpaper('particles')">Partículas</button>
-                    <button onclick="setRandomWallpaper()">Aleatorio</button>
-                    <button onclick="setWallpaperFromPrompt()">Elegir URL</button>
+                <div style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px;">
+                    <button class="neon-btn-small" onclick="setWallpaper('particles')">Partículas</button>
+                    <button class="neon-btn-small" onclick="setRandomWallpaper()">Cyberpunk</button>
+                    <button class="neon-btn-small" onclick="setWallpaperFromPrompt()">URL</button>
+                    <label class="neon-btn-small" style="cursor:pointer; text-align:center;">
+                        Subir
+                        <input type="file" id="local-wallpaper-upload" accept="image/*" style="display:none;" onchange="uploadLocalWallpaper(event)">
+                    </label>
                 </div>
                 <hr>
                 <p><strong>Fondo de perfil</strong></p>
-                <div id="profile-preview" style="width: 100px; height: 100px; border-radius: 50%; background: #ccc; margin: 10px auto; background-size: cover; background-position: center;"></div>
-                <button onclick="setProfilePicture()">Cambiar foto</button>
+                <div id="profile-preview" style="width: 80px; height: 80px; border-radius: 50%; background: #ccc; margin: 10px auto; background-size: cover; background-position: center;"></div>
+                <button class="neon-btn-small" onclick="setProfilePicture()">Cambiar foto</button>
                 <hr>
-                <p><strong>Efectos</strong></p>
-                <button onclick="toggleMatrix()">Lluvia Matrix</button>
-                <button onclick="togglePowerSaver()">Modo ahorro</button>
+                <p><strong>Sonido y Efectos</strong></p>
+                <button class="neon-btn-small" onclick="toggleSound()">SFX: <span id="sound-status">ON</span></button>
+                <button class="neon-btn-small" onclick="toggleMatrix()">Lluvia Matrix</button>
+                <button class="neon-btn-small" onclick="togglePowerSaver()">Ahorro Energía</button>
                 <hr>
-                <p><strong>Modo oscuro/claro</strong></p>
-                <button onclick="toggleDarkMode()">Alternar</button>
-                <hr>
-                <p>Sistema v8.0 · Edición Definitiva</p>
+                <button class="neon-btn-small" onclick="toggleDarkMode()">Modo Oscuro/Claro</button>
             </div>
         </div>
 
-        <!-- EXPLORADOR DE ARCHIVOS -->
-        <div id="window-files" class="window hidden" style="width: 600px; height: 450px;" data-app="files">
-            <div class="window-header" onmousedown="startDrag(event, 'window-files')">
-                <span><i class="fas fa-folder-open" style="margin-right: 8px;"></i>Explorador</span>
+        <div id="window-files" class="window hidden app-medium" data-app="files">
+            <div class="window-header">
+                <span><i class="fas fa-folder-open"></i> Explorador</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('files')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-files')"></button>
@@ -166,10 +158,9 @@
             </div>
         </div>
 
-        <!-- REPRODUCTOR DE MÚSICA con visualizador -->
-        <div id="window-music" class="window hidden" style="width: 450px; height: 550px;" data-app="music">
-            <div class="window-header" onmousedown="startDrag(event, 'window-music')">
-                <span><i class="fas fa-music" style="margin-right: 8px;"></i>Reproductor</span>
+        <div id="window-music" class="window hidden app-medium" data-app="music">
+            <div class="window-header">
+                <span><i class="fas fa-music"></i> Reproductor</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('music')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-music')"></button>
@@ -177,9 +168,9 @@
                 </div>
             </div>
             <div class="window-content" style="background: #282a36; color: white; padding: 15px; display: flex; flex-direction: column;">
-                <div id="current-song" style="font-size: 1.2rem; margin-bottom: 10px; text-align: center;">Selecciona una canción</div>
-                <canvas id="visualizer" width="400" height="100" style="width:100%; height:100px; background:#000; margin-bottom:10px;"></canvas>
-                <audio id="audio-player" controls style="width:100%; margin-bottom: 15px;"></audio>
+                <div id="current-song" style="font-size: 1.1rem; margin-bottom: 10px; text-align: center;">Selecciona una pista</div>
+                <canvas id="visualizer" width="400" height="100" style="width:100%; height:80px; background:#000; margin-bottom:10px; border-radius: 8px; border: 1px solid var(--neon-cyan); box-shadow: 0 0 10px rgba(0,243,255,0.2);"></canvas>
+                <audio id="audio-player" controls style="width:100%; margin-bottom: 15px;" crossorigin="anonymous"></audio>
                 <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
                     <button id="prev-btn" class="music-btn"><i class="fas fa-step-backward"></i></button>
                     <button id="play-pause-btn" class="music-btn"><i class="fas fa-play"></i></button>
@@ -191,96 +182,149 @@
             </div>
         </div>
 
-        <!-- JUEGO: Tres en Raya -->
-        <div id="window-ttt" class="window hidden" style="width: 350px; height: 400px;" data-app="ttt">
-            <div class="window-header" onmousedown="startDrag(event, 'window-ttt')">
-                <span><i class="fas fa-gamepad" style="margin-right: 8px;"></i>Tres en Raya</span>
+        <div id="window-ttt" class="window hidden app-medium" data-app="ttt">
+            <div class="window-header">
+                <span><i class="fas fa-gamepad"></i> Tres en Raya</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('ttt')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-ttt')"></button>
                     <button class="win-btn close-btn" onclick="closeApp('ttt')"></button>
                 </div>
             </div>
-            <div class="window-content" style="background: #2d2d3a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <div id="ttt-turn" style="margin-bottom: 15px;">Turno de ❌</div>
-                <div id="ttt-board" style="display: grid; grid-template-columns: repeat(3, 80px); gap: 5px;"></div>
-                <button id="ttt-reset" style="margin-top: 20px; padding: 8px 20px;">Reiniciar</button>
+            <div class="window-content ttt-bg" style="position:relative;">
+                <div id="ttt-turn" class="game-title">Turno <span style="color:var(--neon-cyan);">❌</span></div>
+                <div id="ttt-board" class="ttt-grid"></div>
+                <button id="ttt-reset" class="neon-btn" style="margin-top: 15px;">Reiniciar</button>
+                <div id="ttt-overlay" class="game-overlay hidden">
+                    <h2 id="ttt-result">¡Ganaste!</h2>
+                </div>
             </div>
         </div>
 
-        <!-- JUEGO: Snake (corregido) -->
-        <div id="window-snake" class="window hidden" style="width: 400px; height: 500px;" data-app="snake">
-            <div class="window-header" onmousedown="startDrag(event, 'window-snake')">
-                <span><i class="fas fa-gamepad"></i> Snake</span>
+        <div id="window-snake" class="window hidden app-large" data-app="snake">
+            <div class="window-header">
+                <span><i class="fas fa-gamepad"></i> Neon Snake</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('snake')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-snake')"></button>
                     <button class="win-btn close-btn" onclick="closeApp('snake')"></button>
                 </div>
             </div>
-            <div class="window-content" style="background:#111; display:flex; flex-direction:column; align-items:center;">
-                <canvas id="snake-canvas" width="300" height="300" style="border:1px solid var(--neon-cyan); margin:10px;"></canvas>
-                <div style="color:white;">Puntuación: <span id="snake-score">0</span> | Máxima: <span id="snake-highscore">0</span></div>
-                <button id="snake-reset" style="margin:5px;">Reiniciar</button>
-                <div style="color:#aaa; font-size:12px;">Usa las flechas del teclado</div>
+            <div class="window-content snake-bg" style="position:relative;">
+                <div class="snake-stats" style="color:#fff;">NIVEL: <span id="snake-level-display" style="color:var(--neon-yellow);">1/5</span></div>
+                <div class="snake-stats" style="color:#aaa; font-size:0.9rem;">Puntos: <span id="snake-score" style="color:var(--neon-cyan);">0</span> / 100</div>
+                <div style="position:relative; margin-top:10px; width: 100%; max-width: 450px; aspect-ratio: 1/1;">
+                    <canvas id="snake-canvas" width="450" height="450" class="snake-board canvas-responsive"></canvas>
+                    <div id="snake-overlay" class="game-overlay">
+                        <h2 id="snake-overlay-title">NEON SNAKE</h2>
+                        <p id="snake-overlay-desc">Evita las paredes y llega a 100pts</p>
+                        <button id="snake-start-btn" class="neon-btn" style="margin-top:20px;">INICIAR</button>
+                    </div>
+                </div>
+                <div class="controls-hint"><i class="fas fa-hand-pointer"></i> Desliza (Swipe) en la pantalla</div>
             </div>
         </div>
 
-        <!-- JUEGO: 2048 -->
-        <div id="window-2048" class="window hidden" style="width: 400px; height: 500px;" data-app="2048">
-            <div class="window-header" onmousedown="startDrag(event, 'window-2048')">
-                <span><i class="fas fa-th"></i> 2048</span>
+        <div id="window-pong" class="window hidden app-large" data-app="pong">
+            <div class="window-header">
+                <span><i class="fas fa-table-tennis"></i> Neon Pong</span>
                 <div class="window-controls">
-                    <button class="win-btn minimize-btn" onclick="minimizeApp('2048')"></button>
-                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-2048')"></button>
-                    <button class="win-btn close-btn" onclick="closeApp('2048')"></button>
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('pong')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-pong')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('pong')"></button>
                 </div>
             </div>
-            <div class="window-content" style="background:#222; display:flex; flex-direction:column; align-items:center;">
-                <div id="game-2048" style="margin:20px;"></div>
-                <div style="color:white;">Puntuación: <span id="score-2048">0</span></div>
-                <button id="reset-2048" style="margin:5px;">Nuevo juego</button>
+            <div class="window-content pong-bg" style="position:relative; background:#050508; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 10px;">
+                <div class="snake-stats" style="color:#fff; margin-bottom: 5px;">NIVEL: <span id="pong-level-display" style="color:var(--neon-yellow);">1</span></div>
+                <div class="snake-stats" style="margin-bottom:10px; width: 100%; max-width: 600px; display:flex; justify-content:space-between;">
+                    <span style="color:var(--neon-cyan);">Jugador: <span id="pong-player-score">0</span></span>
+                    <span style="color:var(--neon-pink);">IA: <span id="pong-ai-score">0</span></span>
+                </div>
+                <div style="position:relative; width: 100%; max-width: 600px;">
+                    <canvas id="pong-canvas" width="600" height="400" class="canvas-responsive" style="background:#0a0a10; border:2px solid var(--neon-purple); border-radius:8px; box-shadow:0 0 20px rgba(188,19,254,0.3); touch-action: none;"></canvas>
+                    <div id="pong-overlay" class="game-overlay">
+                        <h2 id="pong-result-text">NEON PONG</h2>
+                        <button id="pong-start-btn" class="neon-btn" style="margin-top:20px;">Jugar</button>
+                    </div>
+                </div>
+                <div class="controls-hint"><i class="fas fa-hand-pointer"></i> Toca y arrastra para mover</div>
             </div>
         </div>
 
-        <!-- JUEGO: Memorama -->
-        <div id="window-memory" class="window hidden" style="width: 450px; height: 500px;" data-app="memory">
-            <div class="window-header" onmousedown="startDrag(event, 'window-memory')">
-                <span><i class="fas fa-brain"></i> Memorama</span>
+        <div id="window-breakout" class="window hidden app-large" data-app="breakout">
+            <div class="window-header">
+                <span><i class="fas fa-cubes"></i> Neon Breakout</span>
+                <div class="window-controls">
+                    <button class="win-btn minimize-btn" onclick="minimizeApp('breakout')"></button>
+                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-breakout')"></button>
+                    <button class="win-btn close-btn" onclick="closeApp('breakout')"></button>
+                </div>
+            </div>
+            <div class="window-content snake-bg" style="position:relative; padding: 10px;">
+                <div class="snake-stats" style="color:#fff; display:flex; gap:15px;">
+                    <span>NIVEL: <span id="breakout-level-display" style="color:var(--neon-yellow);">1</span></span>
+                    <span>VIDAS: <span id="breakout-lives" style="color:var(--neon-pink);">3</span></span>
+                    <span>SCORE: <span id="breakout-score" style="color:var(--neon-cyan);">0</span></span>
+                </div>
+                <div style="position:relative; margin-top: 10px; width: 100%; max-width: 600px;">
+                    <canvas id="breakout-canvas" width="600" height="500" class="canvas-responsive" style="background:#0a0a10; border:2px solid var(--neon-cyan); border-radius:8px; touch-action: none;"></canvas>
+                    <div id="breakout-overlay" class="game-overlay">
+                        <h2 id="breakout-result-text">DESTRUCTOR</h2>
+                        <button id="breakout-start-btn" class="neon-btn" style="margin-top:20px;">Iniciar</button>
+                    </div>
+                </div>
+                <div class="controls-hint"><i class="fas fa-hand-pointer"></i> Toca y desliza para mover la barra</div>
+            </div>
+        </div>
+
+        <div id="window-memory" class="window hidden app-medium" data-app="memory">
+            <div class="window-header">
+                <span><i class="fas fa-brain"></i> Memorama Holográfico</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('memory')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-memory')"></button>
                     <button class="win-btn close-btn" onclick="closeApp('memory')"></button>
                 </div>
             </div>
-            <div class="window-content" style="background:#333; display:flex; flex-direction:column; align-items:center;">
-                <div id="memory-grid" style="display:grid; grid-template-columns:repeat(4,80px); gap:10px; margin:20px;"></div>
-                <button id="memory-reset">Reiniciar</button>
+            <div class="window-content memory-bg" style="position:relative;">
+                <div id="memory-grid" class="memory-grid-3d"></div>
+                <button id="memory-reset" class="neon-btn" style="margin-top: 20px;">Nuevo Escaneo</button>
+                <div id="memory-overlay" class="game-overlay hidden">
+                    <h2>¡HACKEADO!</h2>
+                    <p>Memoria sincronizada.</p>
+                </div>
             </div>
         </div>
 
-        <!-- JUEGO: Ahorcado -->
-        <div id="window-hangman" class="window hidden" style="width: 400px; height: 500px;" data-app="hangman">
-            <div class="window-header" onmousedown="startDrag(event, 'window-hangman')">
-                <span><i class="fas fa-skull"></i> Ahorcado</span>
+        <div id="window-hangman" class="window hidden app-medium" data-app="hangman">
+            <div class="window-header">
+                <span><i class="fas fa-skull"></i> Decodificador</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('hangman')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-hangman')"></button>
                     <button class="win-btn close-btn" onclick="closeApp('hangman')"></button>
                 </div>
             </div>
-            <div class="window-content" style="background:#222; color:white; padding:20px; text-align:center;">
-                <div id="hangman-word" style="font-size:2rem; letter-spacing:10px;"></div>
-                <div id="hangman-letters" style="margin:20px 0;"></div>
-                <div id="hangman-attempts">Intentos restantes: 6</div>
-                <button id="hangman-reset">Nueva palabra</button>
+            <div class="window-content hangman-bg" style="position:relative;">
+                <canvas id="hangman-canvas" width="200" height="200" style="margin-bottom: 10px; max-width: 150px;"></canvas>
+                <div id="hangman-word" class="hangman-word-display" style="font-size: 1.8rem;"></div>
+                <div id="hangman-hint-text" style="color:var(--neon-yellow); font-size:14px; margin-bottom:5px; font-style:italic; text-align:center;"></div>
+                <div id="hangman-attempts" style="color: var(--neon-pink); font-size: 14px; margin-bottom: 10px;">Fallos: 0/6</div>
+                <div id="hangman-letters" class="hangman-keyboard"></div>
+                <div style="display:flex; gap:10px; margin-top: 15px;">
+                    <button id="hangman-hint-btn" class="neon-btn-small" style="border-color:var(--neon-yellow); color:var(--neon-yellow);">Pista</button>
+                    <button id="hangman-reset" class="neon-btn-small">Nueva Secuencia</button>
+                </div>
+                <div id="hangman-overlay" class="game-overlay hidden">
+                    <h2 id="hangman-result-title">RESULTADO</h2>
+                    <p id="hangman-result-word"></p>
+                </div>
             </div>
         </div>
 
-        <!-- PAPELERA -->
-        <div id="window-trash" class="window hidden" style="width: 500px; height: 400px;" data-app="trash">
-            <div class="window-header" onmousedown="startDrag(event, 'window-trash')">
-                <span><i class="fas fa-trash" style="margin-right: 8px;"></i>Papelera</span>
+        <div id="window-trash" class="window hidden app-medium" data-app="trash">
+            <div class="window-header">
+                <span><i class="fas fa-trash"></i> Papelera</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('trash')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-trash')"></button>
@@ -288,59 +332,17 @@
                 </div>
             </div>
             <div class="window-content" style="background: #f0f0f0; padding: 15px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom:10px;">
-                    <span>Elementos en papelera: <span id="trash-count">0</span></span>
-                    <button id="empty-trash" style="background:#ff5f56; color:white; border:none; padding:5px 10px; border-radius:4px;">Vaciar papelera</button>
+                <div style="display: flex; justify-content: space-between; margin-bottom:10px; align-items: center;">
+                    <span style="color: #333; font-weight: bold;">Elementos: <span id="trash-count">0</span></span>
+                    <button id="empty-trash" style="background:#ff5f56; color:white; border:none; padding:8px 12px; border-radius:4px;">Vaciar Todo</button>
                 </div>
-                <div id="trash-items" style="display: flex; flex-wrap: wrap; gap: 20px; overflow-y: auto; height: 280px;"></div>
+                <div id="trash-items" style="display: flex; flex-wrap: wrap; gap: 20px; overflow-y: auto; height: 100%; color: #333;"></div>
             </div>
         </div>
 
-        <!-- EDITOR DE IMÁGENES -->
-        <div id="window-editor" class="window hidden" style="width: 650px; height: 550px;" data-app="editor">
-            <div class="window-header" onmousedown="startDrag(event, 'window-editor')">
-                <span><i class="fas fa-paint-brush"></i> Editor de Imágenes</span>
-                <div class="window-controls">
-                    <button class="win-btn minimize-btn" onclick="minimizeApp('editor')"></button>
-                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-editor')"></button>
-                    <button class="win-btn close-btn" onclick="closeApp('editor')"></button>
-                </div>
-            </div>
-            <div class="window-content" style="background:#222; color:white; padding:10px;">
-                <canvas id="editor-canvas" width="500" height="300" style="border:1px solid #444; width:100%; height:auto;"></canvas>
-                <div style="margin-top:10px; display:flex; gap:5px; flex-wrap:wrap;">
-                    <button onclick="applyFilter('grayscale')">Grises</button>
-                    <button onclick="applyFilter('sepia')">Sepia</button>
-                    <button onclick="applyFilter('invert')">Invertir</button>
-                    <button onclick="applyFilter('brightness')">Brillo+</button>
-                    <button onclick="applyFilter('blur')">Blur</button>
-                    <button onclick="applyFilter('sharpen')">Enfocar</button>
-                    <button onclick="applyFilter('contrast')">Contraste</button>
-                    <input type="file" id="imageUpload" accept="image/*">
-                    <button onclick="resetImage()">Restaurar</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- APLICACIÓN CLIMA -->
-        <div id="window-weather" class="window hidden" style="width: 300px; height: 200px;" data-app="weather">
-            <div class="window-header" onmousedown="startDrag(event, 'window-weather')">
-                <span><i class="fas fa-cloud-sun"></i> Clima</span>
-                <div class="window-controls">
-                    <button class="win-btn minimize-btn" onclick="minimizeApp('weather')"></button>
-                    <button class="win-btn maximize-btn" onclick="maximizeApp('window-weather')"></button>
-                    <button class="win-btn close-btn" onclick="closeApp('weather')"></button>
-                </div>
-            </div>
-            <div class="window-content" style="padding:20px; text-align:center;">
-                <div id="weather-info">Cargando...</div>
-            </div>
-        </div>
-
-        <!-- Menú Inicio mejorado -->
         <div id="start-menu" class="hidden">
             <div style="padding:10px;">
-                <input type="text" id="start-search" placeholder="Buscar aplicaciones..." style="width:100%; padding:8px; background:#333; border:1px solid var(--neon-cyan); color:white; border-radius:4px;">
+                <input type="text" id="start-search" placeholder="Buscar aplicaciones..." style="width:100%; padding:10px; background:#222; border:1px solid var(--neon-cyan); color:white; border-radius:6px; outline: none;">
             </div>
             <div class="start-menu-apps" id="start-menu-apps"></div>
             <div class="start-footer">
@@ -348,40 +350,36 @@
             </div>
         </div>
 
-        <!-- Barra de tareas -->
         <div id="taskbar">
             <div class="taskbar-left">
-                <button id="start-btn">
-                    <i class="fas fa-bolt start-icon"></i>
-                </button>
+                <button id="start-btn"><i class="fas fa-bolt start-icon"></i></button>
             </div>
             <div id="taskbar-apps"></div>
             <div class="taskbar-right system-tray">
-                <span id="weather-widget"><i class="fas fa-sun"></i> 24°C</span>
+                <span id="weather-widget" class="hide-mobile"><i class="fas fa-sun"></i> 24°C</span>
                 <span id="battery-widget"><i class="fas fa-battery-full"></i> 100%</span>
-                <span><i class="fas fa-wifi"></i></span>
-                <span><i class="fas fa-volume-up"></i></span>
+                <span class="hide-mobile"><i class="fas fa-wifi"></i></span>
                 <div id="clock">--:--</div>
             </div>
         </div>
     </div>
 
-    <!-- Menú contextual -->
     <div id="context-menu" class="context-menu hidden">
-        <ul>
-            <li id="ctx-new-file"><i class="fas fa-file"></i> Nuevo archivo de texto</li>
-            <li id="ctx-new-folder"><i class="fas fa-folder"></i> Nueva carpeta</li>
-            <li id="ctx-wallpaper"><i class="fas fa-image"></i> Cambiar fondo</li>
-            <li id="ctx-sort"><i class="fas fa-sort-alpha-down"></i> Ordenar iconos</li>
+        <ul id="ctx-desktop-options">
+            <li id="ctx-new-file"><i class="fas fa-file"></i> Nueva Nota</li>
+            <li id="ctx-new-folder"><i class="fas fa-folder"></i> Nueva Carpeta</li>
+            <li id="ctx-wallpaper"><i class="fas fa-image"></i> Fondo Aleatorio</li>
+        </ul>
+        <ul id="ctx-icon-options" class="hidden">
+            <li id="ctx-rename"><i class="fas fa-edit"></i> Renombrar</li>
+            <li id="ctx-delete"><i class="fas fa-trash"></i> Eliminar</li>
         </ul>
     </div>
-
-    <!-- Notificación toast -->
     <div id="toast" class="toast hidden">Mensaje</div>
-
-    <!-- Vista previa de ventana -->
     <div id="window-preview" class="window-preview hidden"></div>
 
-    <script src="app.js"></script>
+    <script src="core.js"></script>
+    <script src="apps.js"></script>
+    <script src="games.js"></script>
 </body>
 </html>
