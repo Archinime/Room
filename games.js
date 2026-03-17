@@ -342,28 +342,87 @@ let hangmanDictionary = [
     { w: 'SASUKE', h: 'Último sobreviviente de su clan, viaja buscando venganza.' },
     { w: 'BULMA', h: 'Brillante inventora del radar del dragón.' }
 ];
+
 let currentHangmanObj = null, hangmanGuessed = [], hangmanAttempts = 6, hintsUsed = false;
+
 function initHangman() { 
     document.getElementById('hangman-reset').addEventListener('click', resetHangman); 
     document.getElementById('hangman-hint-btn').addEventListener('click', showHangmanHint);
-    resetHangman(); // INICIALIZA EL JUEGO AL INSTANTE
+    resetHangman();
 }
-function resetHangman() { currentHangmanObj = hangmanDictionary[Math.floor(Math.random() * hangmanDictionary.length)]; hangmanGuessed = []; hangmanAttempts = 6; hintsUsed = false; document.getElementById('hangman-hint-text').innerText = "";
-    document.getElementById('hangman-hint-btn').disabled = false; document.getElementById('hangman-overlay').classList.add('hidden'); renderHangman(); drawHangmanVisual(); }
-function showHangmanHint() { if(!hintsUsed && currentHangmanObj && hangmanAttempts > 1) { document.getElementById('hangman-hint-text').innerText = "Pista: " + currentHangmanObj.h;
-    hintsUsed = true; document.getElementById('hangman-hint-btn').disabled = true; hangmanAttempts--; drawHangmanVisual(); renderHangman(); playSound('eat'); } }
+
+function resetHangman() { 
+    currentHangmanObj = hangmanDictionary[Math.floor(Math.random() * hangmanDictionary.length)]; 
+    hangmanGuessed = []; 
+    hangmanAttempts = 6; 
+    hintsUsed = false; 
+    // MUESTRA LA DESCRIPCIÓN POR DEFECTO AUTOMÁTICAMENTE
+    document.getElementById('hangman-hint-text').innerText = "Descripción: " + currentHangmanObj.h;
+    
+    document.getElementById('hangman-hint-btn').disabled = false; 
+    document.getElementById('hangman-overlay').classList.add('hidden'); 
+    renderHangman(); 
+    drawHangmanVisual(); 
+}
+
+function showHangmanHint() { 
+    if(!hintsUsed && currentHangmanObj && hangmanAttempts > 1) { 
+        // Encuentra las letras que aún no se han adivinado
+        let unrevealed = currentHangmanObj.w.split('').filter(l => !hangmanGuessed.includes(l));
+        
+        if (unrevealed.length > 0) {
+            let hintLetter = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+            hangmanAttempts--; // Resta una vida por usar la pista
+            hintsUsed = true; 
+            document.getElementById('hangman-hint-btn').disabled = true; 
+            
+            // Simula que el usuario presionó la letra
+            guessHangman(hintLetter); 
+        }
+    } 
+}
+
 function renderHangman() {
     if(!currentHangmanObj) return;
     let display = currentHangmanObj.w.split('').map(letter => hangmanGuessed.includes(letter) ? letter : '_').join(' ');
-    document.getElementById('hangman-word').textContent = display; document.getElementById('hangman-attempts').textContent = `Fallos: ${6 - hangmanAttempts}/6`;
-    if (!display.includes('_')) gameOverHangman(true); let lettersDiv = document.getElementById('hangman-letters'); lettersDiv.innerHTML = '';
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(letter => { let btn = document.createElement('button'); btn.className = 'hangman-key'; btn.textContent = letter; btn.disabled = hangmanGuessed.includes(letter); btn.onclick = () => guessHangman(letter); lettersDiv.appendChild(btn); });
+    document.getElementById('hangman-word').textContent = display; 
+    document.getElementById('hangman-attempts').textContent = `Fallos: ${6 - hangmanAttempts}/6`;
+    
+    if (!display.includes('_')) gameOverHangman(true); 
+    
+    let lettersDiv = document.getElementById('hangman-letters'); lettersDiv.innerHTML = '';
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(letter => { 
+        let btn = document.createElement('button'); 
+        btn.className = 'hangman-key'; 
+        btn.textContent = letter; 
+        btn.disabled = hangmanGuessed.includes(letter); 
+        btn.onclick = () => guessHangman(letter); 
+        lettersDiv.appendChild(btn); 
+    });
 }
-function guessHangman(letter) { hangmanGuessed.push(letter); if (!currentHangmanObj.w.includes(letter)) { hangmanAttempts--; playSound('hit'); drawHangmanVisual(); } else { playSound('open'); } renderHangman();
-    if (hangmanAttempts === 0) gameOverHangman(false); }
-function gameOverHangman(win) { const overlay = document.getElementById('hangman-overlay'); document.getElementById('hangman-result-title').innerText = win ? '¡GANASTE!' : 'PERDISTE';
-    document.getElementById('hangman-result-title').style.color = win ? 'var(--neon-cyan)' : 'var(--neon-pink)'; document.getElementById('hangman-result-word').innerText = `Palabra: ${currentHangmanObj.w}`; overlay.classList.remove('hidden'); if(win) playSound('win'); else playSound('die');
+
+function guessHangman(letter) { 
+    hangmanGuessed.push(letter); 
+    if (!currentHangmanObj.w.includes(letter)) { 
+        hangmanAttempts--; 
+        playSound('hit'); 
+        drawHangmanVisual(); 
+    } else { 
+        playSound('open'); 
+    } 
+    renderHangman();
+    if (hangmanAttempts === 0) gameOverHangman(false); 
 }
+
+function gameOverHangman(win) { 
+    const overlay = document.getElementById('hangman-overlay'); 
+    document.getElementById('hangman-result-title').innerText = win ? '¡GANASTE!' : 'PERDISTE';
+    document.getElementById('hangman-result-title').style.color = win ? 'var(--neon-cyan)' : 'var(--neon-pink)'; 
+    document.getElementById('hangman-result-word').innerText = `Palabra: ${currentHangmanObj.w}`; 
+    overlay.classList.remove('hidden'); 
+    if(win) playSound('win'); else playSound('die');
+}
+
 function drawHangmanVisual() {
     const canvas = document.getElementById('hangman-canvas'); const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = '#ff0055'; ctx.lineWidth = 5; ctx.shadowBlur = 10; ctx.shadowColor = '#ff0055'; 

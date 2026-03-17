@@ -72,6 +72,19 @@ cursor: grab; font-weight: 600; font-size: 14px; user-select: none; border-botto
 .maximize-btn { background: #27c93f; } .maximize-btn:hover { background: #1aa12f; box-shadow: 0 0 10px #1aa12f;}
 .window-content { flex-grow: 1; background: rgba(255,255,255,0.95); color: #111; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
 
+/* Navegador Multi-Tab */
+.browser-tabs-container { display: flex; background: #dcdcdc; padding: 6px 6px 0 6px; align-items: flex-end; }
+.browser-tabs-list { display: flex; overflow-x: auto; gap: 4px; scrollbar-width: none; flex-grow: 1; }
+.browser-tabs-list::-webkit-scrollbar { display: none; }
+.browser-tab { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; background: #ececec; border-radius: 8px 8px 0 0; cursor: pointer; min-width: 100px; max-width: 160px; font-size: 13px; color: #444; border: 1px solid #ccc; border-bottom: none; flex-shrink: 0; }
+.browser-tab.active { background: #f0f0f0; font-weight: bold; border-top: 3px solid var(--accent-color); color: #000; box-shadow: 0 -2px 5px rgba(0,0,0,0.05); }
+.browser-tab-close { margin-left: 8px; cursor: pointer; color: #888; border: none; background: none; font-size: 16px; }
+.browser-tab-close:hover { color: #ff3b30; }
+.new-tab-btn { padding: 5px 12px; cursor: pointer; border: none; background: transparent; font-size: 18px; color: #555; transition: 0.2s; }
+.new-tab-btn:hover { color: var(--accent-color); text-shadow: 0 0 5px var(--accent-color); }
+.iframe-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: none; }
+.iframe-container.active { display: block; }
+
 /* Botones Neon */
 .neon-btn { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 10px 18px; border-radius: 8px; cursor: pointer;
 transition: all 0.3s ease; text-transform: uppercase; font-weight: bold; font-size: 14px; letter-spacing: 1px; }
@@ -168,7 +181,6 @@ border-radius: 20px; box-shadow: 0 25px 70px rgba(0,0,0,0.7); z-index: 9999; pad
 .context-menu.hidden { display: none; }
 .toast { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--toast-bg); color: white; padding: 12px 24px; border-radius: 50px; font-size: 14px; backdrop-filter: blur(5px); border: 1px solid var(--neon-cyan); transition: opacity 0.3s; z-index: 30000; }
 .toast.hidden { opacity: 0; pointer-events: none; }
-.window-preview { display: none; } 
 
 #file-list .file-item { width: 70px; text-align: center; cursor: pointer; padding: 8px; border-radius: 8px; color: white; }
 .file-item .file-icon { font-size: 28px; }
@@ -177,3 +189,23 @@ border-radius: 20px; box-shadow: 0 25px 70px rgba(0,0,0,0.7); z-index: 9999; pad
 .music-btn { background: var(--accent-color); border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; color: #000; font-size: 18px; flex-shrink: 0;}
 #playlist li { padding: 10px 12px; margin: 5px 0; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; border: 1px solid transparent;}
 #playlist li.playing { background: rgba(0,243,255,0.2); color: var(--neon-cyan); border-color: var(--neon-cyan); font-weight: bold; }
+
+/* MEDIA QUERIES PARA MOBILE (Modo PC Adaptativo) */
+@media (max-width: 768px) {
+    .window { 
+        width: 94vw !important; 
+        height: calc(100vh - 100px) !important; 
+        top: 3vh !important; 
+        left: 3vw !important; 
+        transform: none !important; 
+    }
+    .window.hidden { 
+        opacity: 0 !important; 
+        pointer-events: none !important; 
+        display: none !important; 
+        transform: scale(0.9) translateY(20px) !important; 
+    }
+    .hide-mobile { display: none !important; }
+    .start-menu-apps { grid-template-columns: repeat(3, 1fr); }
+    .game-overlay h2 { font-size: 1.6rem; }
+}

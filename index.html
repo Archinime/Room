@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1280, initial-scale=1.0">
-    <title>OS Virtual · Edición Definitiva PC-Mode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OS Virtual · Edición Definitiva Premium</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -20,7 +20,7 @@
 
         <div id="window-browser" class="window hidden app-large" data-app="browser">
             <div class="window-header">
-                <span><i class="fas fa-globe"></i> Navegador Web</span>
+                <span><i class="fas fa-globe"></i> Navegador Web Multi-Tab</span>
                 <div class="window-controls">
                     <button class="win-btn minimize-btn" onclick="minimizeApp('browser')"></button>
                     <button class="win-btn maximize-btn" onclick="maximizeApp('window-browser')"></button>
@@ -28,11 +28,15 @@
                 </div>
             </div>
             <div class="window-content" style="padding: 0; display: flex; flex-direction: column;">
-                <div style="display: flex; padding: 8px; background: #f0f0f0; gap: 5px;">
-                    <input type="text" id="browser-url" placeholder="Buscar URL o término..." value="https://archinime.github.io/-Archinime-" style="flex:1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px;">
+                <div class="browser-tabs-container">
+                    <div id="browser-tabs-list" class="browser-tabs-list"></div>
+                    <button class="new-tab-btn" onclick="addBrowserTab()"><i class="fas fa-plus"></i></button>
+                </div>
+                <div style="display: flex; padding: 8px; background: #f0f0f0; gap: 5px; border-bottom: 1px solid #ccc;">
+                    <input type="text" id="browser-url" placeholder="Buscar URL o término..." style="flex:1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; outline:none;">
                     <button onclick="navigateBrowser()" style="padding: 8px 15px; border-radius: 6px; border: none; background: var(--accent-color); color: #000; cursor: pointer; font-weight: bold;">Ir</button>
                 </div>
-                <iframe id="browser-frame" src="https://archinime.github.io/-Archinime-" style="width:100%; height:100%; border:none; flex-grow: 1;"></iframe>
+                <div id="browser-iframes" style="flex-grow: 1; position: relative;"></div>
             </div>
         </div>
 
@@ -129,11 +133,12 @@
                 <hr>
                 <p><strong>Fondo de escritorio</strong></p>
                 <div style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px;">
-                    <button class="neon-btn-small" onclick="cyclePremiumWallpapers()"><i class="fas fa-image"></i> Cambiar Fondo Mágico</button>
+                    <button class="neon-btn-small" onclick="setWallpaper('default')"><i class="fas fa-image"></i> Fondo Archinime</button>
+                    <button class="neon-btn-small" onclick="cyclePremiumWallpapers()"><i class="fas fa-magic"></i> Fondo Mágico</button>
                     <button class="neon-btn-small" onclick="setWallpaper('particles')">Partículas Interactivas</button>
                     <button class="neon-btn-small" onclick="setWallpaperFromPrompt()">Cargar por URL</button>
                     <label class="neon-btn-small" style="cursor:pointer; text-align:center;">
-                        Subir desde Galería (Max 20MB)
+                        Subir desde Galería
                         <input type="file" id="local-wallpaper-upload" accept="image/*" style="display:none;" onchange="uploadLocalWallpaper(event)">
                     </label>
                 </div>
@@ -326,11 +331,11 @@
             <div class="window-content hangman-bg" style="position:relative; overflow-y: auto;">
                 <canvas id="hangman-canvas" width="200" height="200" style="margin-bottom: 10px; max-width: 150px;"></canvas>
                 <div id="hangman-word" class="hangman-word-display" style="font-size: 1.8rem;"></div>
-                <div id="hangman-hint-text" style="color:var(--neon-yellow); font-size:14px; margin-bottom:5px; font-style:italic; text-align:center;"></div>
+                <div id="hangman-hint-text" style="color:var(--neon-yellow); font-size:14px; margin-bottom:10px; font-weight:bold; text-align:center; padding: 0 10px;"></div>
                 <div id="hangman-attempts" style="color: var(--neon-pink); font-size: 14px; margin-bottom: 10px;">Fallos: 0/6</div>
                 <div id="hangman-letters" class="hangman-keyboard"></div>
                 <div style="display:flex; gap:10px; margin-top: 15px;">
-                    <button id="hangman-hint-btn" class="neon-btn-small" style="border-color:var(--neon-yellow); color:var(--neon-yellow);">Pista</button>
+                    <button id="hangman-hint-btn" class="neon-btn-small" style="border-color:var(--neon-yellow); color:var(--neon-yellow);">Revelar Letra (Cuesta 1 Fallo)</button>
                     <button id="hangman-reset" class="neon-btn-small">Nueva Secuencia</button>
                 </div>
                 <div id="hangman-overlay" class="game-overlay hidden">

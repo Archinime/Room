@@ -15,7 +15,7 @@ let soundEnabled = true, powerSaver = false, powerSaverTimer;
 let matrixEnabled = false, matrixInterval;
 let profilePicture = localStorage.getItem('profilePicture') || '';
 let selectedIconId = null;
-let particlesActive = true;
+let particlesActive = false;
 
 // 25 FONDOS IMPRESIONANTES Y DIVERSOS (Sin repetidos)
 const premiumWallpapers = [
@@ -73,18 +73,21 @@ function playSound(type) {
 
 // --- INICIALIZACIÓN INMEDIATA ---
 document.addEventListener('DOMContentLoaded', () => {
-    const savedBg = localStorage.getItem('customBg');
-    if(savedBg) { 
-        document.body.style.backgroundImage = savedBg; 
+    const savedBg = localStorage.getItem('customBg') || 'url("fondo_anime.avif")';
+    
+    if(savedBg === 'particles') { 
+        document.body.style.backgroundImage = 'none'; 
+        particlesActive = true;
+    } else {
+        document.body.style.backgroundImage = savedBg;
         particlesActive = false;
         let c = document.getElementById('bg-canvas');
         if(c) c.getContext('2d').clearRect(0,0,c.width,c.height);
-    } else {
-        particlesActive = true;
     }
 
     initDesktopIcons();
     initGallery(); initMusicPlayer();
+    initBrowser(); // Inicializa las pestañas del navegador
     renderTTT(); renderFiles();
     renderTrash();
     loadWindowStates(); setupEventListeners();
@@ -108,7 +111,7 @@ function loadWindowStates() {
         const states = JSON.parse(saved);
         for (let [id, state] of Object.entries(states)) {
             const win = document.getElementById(id);
-            if (win) { 
+            if (win && window.innerWidth > 768) { 
                 win.style.top = state.top;
                 win.style.left = state.left; win.style.width = state.width; win.style.height = state.height; if (state.maximized) maximizeApp(id.replace('window-',''));
             }
@@ -116,6 +119,7 @@ function loadWindowStates() {
     }
 }
 function saveWindowState(id) {
+    if(window.innerWidth <= 768) return; // No guardar estado de ventana si está en celular
     const win = document.getElementById(id);
     if (!win) return;
     const state = { top: win.style.top, left: win.style.left, width: win.style.width, height: win.style.height, maximized: !!maximizedWindows[id] };
@@ -150,6 +154,7 @@ function closeApp(appId) {
 function minimizeApp(appId) { document.getElementById(`window-${appId}`).classList.add('hidden'); const taskItem = document.getElementById(`task-${appId}`);
     if(taskItem) taskItem.classList.remove('active'); }
 function maximizeApp(windowId) {
+    if(window.innerWidth <= 768) return; 
     const realId = windowId.startsWith('window-') ? windowId : `window-${windowId}`;
     const win = document.getElementById(realId);
     if (!maximizedWindows[realId]) {
@@ -169,6 +174,7 @@ function bringToFront(element) {
 
 // Drag de Ventanas
 function startDrag(e, windowId) {
+    if(window.innerWidth <= 768) return;
     if (e.target.classList.contains('win-btn') || e.target.closest('.window-controls')) return;
     const win = document.getElementById(windowId); bringToFront(win);
     if (maximizedWindows[windowId]) maximizeApp(windowId.replace('window-',''));
@@ -395,14 +401,15 @@ function setWallpaper(type) {
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     if (type === 'particles') { 
+        localStorage.setItem('customBg', 'particles');
         document.body.style.backgroundImage = 'none'; 
-        localStorage.removeItem('customBg');
         particlesActive = true;
+        initParticles();
     }
-    else { 
-        const url = `url("https://images.unsplash.com/photo-1506744626753-1fa44f1c1fcc?auto=format&fit=crop&w=1920&q=80")`;
+    else if (type === 'default') { 
+        const url = `url("fondo_anime.avif")`;
         document.body.style.backgroundImage = url;
-        localStorage.removeItem('customBg'); 
+        localStorage.setItem('customBg', url); 
         particlesActive = false; 
         ctx.clearRect(0,0, canvas.width, canvas.height); 
     }

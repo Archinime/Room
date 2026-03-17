@@ -33,14 +33,84 @@ function calcPress(val) {
     else { calcExp += val; display.value = calcExp; }
 }
 
+// --- NAVEGADOR MULTI-TAB ---
+let browserTabs = [];
+let activeTabId = null;
+let tabCounter = 0;
+
+function initBrowser() {
+    if(browserTabs.length === 0) addBrowserTab('https://archinime.github.io/-Archinime-');
+}
+
+function addBrowserTab(url = 'https://www.bing.com/') {
+    tabCounter++;
+    const id = tabCounter;
+    browserTabs.push({ id, url });
+    
+    const iframeContainer = document.getElementById('browser-iframes');
+    const iframeWrapper = document.createElement('div');
+    iframeWrapper.className = 'iframe-container';
+    iframeWrapper.id = `iframe-wrap-${id}`;
+    iframeWrapper.innerHTML = `<iframe id="frame-${id}" src="${url}" style="width:100%; height:100%; border:none;"></iframe>`;
+    iframeContainer.appendChild(iframeWrapper);
+
+    switchBrowserTab(id);
+}
+
+function renderBrowserTabs() {
+    const tabsDiv = document.getElementById('browser-tabs-list');
+    tabsDiv.innerHTML = '';
+    browserTabs.forEach(tab => {
+        const tabEl = document.createElement('div');
+        tabEl.className = `browser-tab ${tab.id === activeTabId ? 'active' : ''}`;
+        tabEl.onclick = () => switchBrowserTab(tab.id);
+        
+        let tabTitle = tab.url.replace(/^https?:\/\//,'').split('/')[0];
+        if (tab.url.includes('archinime')) tabTitle = "Archinime";
+
+        tabEl.innerHTML = `<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${tabTitle}</span>
+                           <button class="browser-tab-close" onclick="event.stopPropagation(); closeBrowserTab(${tab.id})">×</button>`;
+        tabsDiv.appendChild(tabEl);
+    });
+}
+
+function switchBrowserTab(id) {
+    activeTabId = id;
+    document.querySelectorAll('.iframe-container').forEach(el => el.classList.remove('active'));
+    const activeIframe = document.getElementById(`iframe-wrap-${id}`);
+    if(activeIframe) activeIframe.classList.add('active');
+    
+    const tab = browserTabs.find(t => t.id === id);
+    if(tab) document.getElementById('browser-url').value = tab.url;
+    
+    renderBrowserTabs();
+}
+
+function closeBrowserTab(id) {
+    browserTabs = browserTabs.filter(t => t.id !== id);
+    const iframe = document.getElementById(`iframe-wrap-${id}`);
+    if(iframe) iframe.remove();
+    
+    if(browserTabs.length > 0) {
+        if(activeTabId === id) switchBrowserTab(browserTabs[browserTabs.length - 1].id);
+        else renderBrowserTabs();
+    } else {
+        addBrowserTab(); // Si cierra todo, se abre una nueva pestaña
+    }
+}
+
 function navigateBrowser() { 
     let url = document.getElementById('browser-url').value;
     if (!url.startsWith('http')) {
         url = 'https://www.bing.com/search?q=' + encodeURIComponent(url);
     }
-    document.getElementById('browser-frame').src = url;
+    const tab = browserTabs.find(t => t.id === activeTabId);
+    if(tab) tab.url = url;
+    document.getElementById(`frame-${activeTabId}`).src = url;
+    renderBrowserTabs(); // Refrescar título
 }
 
+// TERMINAL
 function handleTerminal(e) {
     const inputEl = document.getElementById('term-input'), outputEl = document.getElementById('term-output');
     if (e.key === 'Enter') {
@@ -55,7 +125,9 @@ function handleTerminal(e) {
             case 'fecha': response += `<div>${new Date().toLocaleString()}</div>`; break;
             case 'sistema': response += `<div style='color:#bc13fe'>OS VIRTUAL CYBERPUNK EDITION (PC MODE)</div>`; break;
             case 'ddg': if (args[1]) { openApp('browser', '🌐');
-                setTimeout(() => { document.getElementById('browser-url').value = 'https://www.bing.com/search?q=' + args.slice(1).join('+'); navigateBrowser(); }, 100); response += `<div>Iniciando script de búsqueda por Bing...</div>`; } break;
+                setTimeout(() => { 
+                    addBrowserTab('https://www.bing.com/search?q=' + args.slice(1).join('+'));
+                }, 100); response += `<div>Iniciando script de búsqueda por Bing...</div>`; } break;
             case 'juegos': response += `<div>Módulos de ocio: ttt, snake, pong, breakout, memory, hangman</div>`; break;
             case 'ls': 
                 const dirContent = listDir(currentFileDir);
