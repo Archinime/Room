@@ -17,7 +17,7 @@ let profilePicture = localStorage.getItem('profilePicture') || '';
 let selectedIconId = null;
 let particlesActive = false;
 
-// 25 FONDOS IMPRESIONANTES Y DIVERSOS (Sin repetidos)
+// FONDOS IMPRESIONANTES Y DIVERSOS (Expandido con más opciones Anime/Neon)
 const premiumWallpapers = [
     'https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=1920&q=80',
     'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1920&q=80',
@@ -43,9 +43,25 @@ const premiumWallpapers = [
     'https://images.unsplash.com/photo-1552083375-1447ce886485?auto=format&fit=crop&w=1920&q=80',
     'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1920&q=80',
     'https://images.unsplash.com/photo-1523821741446-edb2b68bb7a0?auto=format&fit=crop&w=1920&q=80',
-    'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1920&q=80'
+    'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1920&q=80',
+    // NUEVOS AÑADIDOS
+    'https://images.unsplash.com/photo-1580136608260-4eb11f4b24fe?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1557672172-298e090bd0f1?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1510133768164-a8f7e4d4e3dc?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1558470598-a5dda9640f68?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1554147090-e1221a04a025?auto=format&fit=crop&w=1920&q=80'
 ];
 let currentWallpaperIndex = 0;
+
+// Detector de Dispositivos Móviles (Para cambiar de Doble Click a Un Solo Toque)
+const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia("(pointer: coarse)").matches);
+
 // --- SISTEMA DE AUDIO SFX ---
 let audioCtxConfigured = false;
 let audioCtx;
@@ -87,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initDesktopIcons();
     initGallery(); initMusicPlayer();
-    initBrowser(); // Inicializa las pestañas del navegador
+    initBrowser(); 
     renderTTT(); renderFiles();
     renderTrash();
     loadWindowStates(); setupEventListeners();
@@ -119,7 +135,7 @@ function loadWindowStates() {
     }
 }
 function saveWindowState(id) {
-    if(window.innerWidth <= 768) return; // No guardar estado de ventana si está en celular
+    if(window.innerWidth <= 768) return; 
     const win = document.getElementById(id);
     if (!win) return;
     const state = { top: win.style.top, left: win.style.left, width: win.style.width, height: win.style.height, maximized: !!maximizedWindows[id] };
@@ -212,7 +228,6 @@ function startDrag(e, windowId) {
 }
 document.querySelectorAll('.window-header').forEach(header => { header.addEventListener('mousedown', (e) => startDrag(e, header.parentElement.id)); header.addEventListener('touchstart', (e) => startDrag(e, header.parentElement.id), {passive: false}); });
 
-// --- Mover a la Papelera desde Core ---
 function moveToTrash(iconDiv) {
     trashItems.push({ name: iconDiv.querySelector('.icon-label').innerText, icon: iconDiv.querySelector('.icon-img').innerText, appId: iconDiv.getAttribute('data-appid') });
     localStorage.setItem('trash', JSON.stringify(trashItems));
@@ -227,32 +242,53 @@ function moveToTrash(iconDiv) {
     showToast('Movido a la papelera');
 }
 
-// --- SNAP TO GRID PARA ICONOS Y RESTRICCION DE SUPERPOSICION ---
+// --- SNAP TO GRID Y UBICACIÓN INTELIGENTE ---
 const GRID_CELL_W = 95; 
 const GRID_CELL_H = 110;
+
+function getFirstEmptyGridSlot() {
+    let cols = Math.max(1, Math.floor((window.innerWidth - 20) / GRID_CELL_W));
+    let rows = Math.max(1, Math.floor((window.innerHeight - 100) / GRID_CELL_H));
+    
+    let occupied = [];
+    document.querySelectorAll('.desktop-icon').forEach(icon => {
+        if(!icon.classList.contains('dragging')) {
+            occupied.push({
+                l: parseInt(icon.style.left)||0,
+                t: parseInt(icon.style.top)||0
+            });
+        }
+    });
+
+    for(let c = 0; c < cols; c++) {
+        for(let r = 0; r < rows; r++) {
+            let testL = (c * GRID_CELL_W) + 10;
+            let testT = (r * GRID_CELL_H) + 10;
+            let isOccupied = occupied.some(pos => Math.abs(pos.l - testL) < 10 && Math.abs(pos.t - testT) < 10);
+            if(!isOccupied) return { left: testL + 'px', top: testT + 'px' };
+        }
+    }
+    return { left: '10px', top: '10px' };
+}
+
 function snapIconToGrid(iconDiv, origLeft, origTop) {
     let currentLeft = parseInt(iconDiv.style.left) || 0;
     let currentTop = parseInt(iconDiv.style.top) || 0;
-    let col = Math.round(currentLeft / GRID_CELL_W);
-    let row = Math.round(currentTop / GRID_CELL_H);
-    
-    col = Math.max(0, col);
-    row = Math.max(0, row);
+    let col = Math.max(0, Math.round(currentLeft / GRID_CELL_W));
+    let row = Math.max(0, Math.round(currentTop / GRID_CELL_H));
     let finalLeft = (col * GRID_CELL_W) + 10;
     let finalTop = (row * GRID_CELL_H) + 10;
-    // Verificar si la casilla destino está ocupada
+    
     let isOccupied = false;
     document.querySelectorAll('.desktop-icon').forEach(otherIcon => {
         if(otherIcon !== iconDiv && otherIcon.id !== 'trash-icon') {
             let otherL = parseInt(otherIcon.style.left)||0;
             let otherT = parseInt(otherIcon.style.top)||0;
-            if(Math.abs(otherL - finalLeft) < 10 && Math.abs(otherT - finalTop) < 10) {
-                isOccupied = true;
-            }
+            if(Math.abs(otherL - finalLeft) < 10 && Math.abs(otherT - finalTop) < 10) isOccupied = true;
         }
     });
+    
     if (isOccupied && origLeft !== undefined && origTop !== undefined) {
-        // Regresar a su sitio si está ocupado
         iconDiv.style.left = origLeft;
         iconDiv.style.top = origTop;
         showToast("Casilla ocupada");
@@ -285,7 +321,6 @@ function makeIconDraggable(iconDiv) {
         
         function checkDropAndEnd() {
             iconDiv.classList.remove('dragging');
-            // Check drop on Trash
             let trash = document.getElementById('trash-icon');
             if(trash && iconDiv.id !== 'trash-icon') {
                 let rect1 = iconDiv.getBoundingClientRect();
@@ -297,7 +332,6 @@ function makeIconDraggable(iconDiv) {
                     return;
                 }
             }
-            // Snap to Grid
             snapIconToGrid(iconDiv, origLeft, origTop);
             saveDesktopIconPositions(); 
         }
@@ -333,6 +367,7 @@ function saveDesktopIconPositions() {
 document.getElementById('start-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('start-menu').classList.toggle('hidden'); });
 document.addEventListener('click', (e) => { const startMenu = document.getElementById('start-menu'), startBtn = document.getElementById('start-btn'); if (!startMenu.contains(e.target) && !startBtn.contains(e.target)) startMenu.classList.add('hidden'); });
 document.getElementById('start-search').addEventListener('input', function(e) { const query = e.target.value.toLowerCase(); document.querySelectorAll('.start-app-icon').forEach(app => { const name = app.querySelector('span').textContent.toLowerCase(); app.style.display = name.includes(query) ? 'flex' : 'none'; }); });
+
 function initDesktopIcons() {
     const defaultApps = [
         { name: 'Navegador', icon: '🌐', appId: 'browser' }, { name: 'Notas', icon: '📝', appId: 'notes' }, { name: 'Terminal', icon: '💻', appId: 'terminal' },
@@ -345,16 +380,17 @@ function initDesktopIcons() {
     defaultApps.forEach(app => {
         const startAppIcon = document.createElement('div'); startAppIcon.className = 'start-app-icon'; startAppIcon.innerHTML = `<div class="app-icon">${app.icon}</div><span>${app.name}</span>`; startAppIcon.onclick = () => { openApp(app.appId, app.icon); }; startMenuAppsContainer.appendChild(startAppIcon);
     });
+    
     const savedIcons = JSON.parse(localStorage.getItem('desktopIcons') || '[]');
     let currentIcons = savedIcons.length > 0 ?
     savedIcons : defaultApps.map((a, i) => ({...a, id: 'icon-'+Date.now()+i, left: (10 + (Math.floor(i/4)*GRID_CELL_W))+'px', top: (120 + ((i%4)*GRID_CELL_H))+'px'}));
-    // Crear íconos excluyendo la papelera (porque ya está en el HTML)
+    
     currentIcons.forEach(icon => {
         if(icon.id !== 'trash-icon') {
             addDesktopIcon(icon.name, icon.icon, icon.appId, icon.id, icon.left, icon.top, false);
         }
     });
-    // Configurar la Papelera
+    
     let trashIcon = document.getElementById('trash-icon');
     if (trashIcon) {
         let trashSaved = savedIcons.find(i => i.id === 'trash-icon');
@@ -369,22 +405,41 @@ function initDesktopIcons() {
         
         let tapCountTrash = 0;
         trashIcon.addEventListener('click', (e) => {
-            tapCountTrash++;
-            if (tapCountTrash === 1) { setTimeout(() => { tapCountTrash = 0; }, 400); }
-            else if (tapCountTrash === 2) { tapCountTrash = 0; openApp('trash', '🗑️'); }
+            if(isTouchDevice) {
+                openApp('trash', '🗑️');
+            } else {
+                tapCountTrash++;
+                if (tapCountTrash === 1) { setTimeout(() => { tapCountTrash = 0; }, 400); }
+                else if (tapCountTrash === 2) { tapCountTrash = 0; openApp('trash', '🗑️'); }
+            }
         });
         makeIconDraggable(trashIcon);
     }
 }
 
-function addDesktopIcon(name, icon, appId, id = 'icon-'+Date.now(), left = '10px', top = '10px', save = true) {
+function addDesktopIcon(name, icon, appId, id = 'icon-'+Date.now(), left = null, top = null, save = true) {
     const container = document.getElementById('desktop-icons');
-    const iconDiv = document.createElement('div'); iconDiv.className = 'desktop-icon'; iconDiv.id = id; iconDiv.style.left = left; iconDiv.style.top = top; iconDiv.setAttribute('data-appid', appId);
+    const iconDiv = document.createElement('div'); iconDiv.className = 'desktop-icon'; iconDiv.id = id; 
+    
+    if (left === null || top === null) {
+        let slot = getFirstEmptyGridSlot();
+        iconDiv.style.left = slot.left;
+        iconDiv.style.top = slot.top;
+    } else {
+        iconDiv.style.left = left; 
+        iconDiv.style.top = top;
+    }
+    
+    iconDiv.setAttribute('data-appid', appId);
     let tapCount = 0;
     iconDiv.addEventListener('click', (e) => {
-        tapCount++;
-        if (tapCount === 1) { setTimeout(() => { tapCount = 0; }, 400); }
-        else if (tapCount === 2) { tapCount = 0; openApp(appId, icon); }
+        if(isTouchDevice) {
+            openApp(appId, icon);
+        } else {
+            tapCount++;
+            if (tapCount === 1) { setTimeout(() => { tapCount = 0; }, 400); }
+            else if (tapCount === 2) { tapCount = 0; openApp(appId, icon); }
+        }
     });
     iconDiv.oncontextmenu = (e) => { e.preventDefault(); showContextMenu(e, 'icon', id); return false; };
     iconDiv.innerHTML = `<div class="icon-img">${icon}</div><span class="icon-label">${name}</span>`; 

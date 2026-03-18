@@ -39,10 +39,10 @@ let activeTabId = null;
 let tabCounter = 0;
 
 function initBrowser() {
-    if(browserTabs.length === 0) addBrowserTab('https://archinime.github.io/-Archinime-');
+    if(browserTabs.length === 0) addBrowserTab(''); // Inicia completamente vacío
 }
 
-function addBrowserTab(url = 'https://www.bing.com/') {
+function addBrowserTab(url = '') {
     tabCounter++;
     const id = tabCounter;
     browserTabs.push({ id, url });
@@ -65,7 +65,7 @@ function renderBrowserTabs() {
         tabEl.className = `browser-tab ${tab.id === activeTabId ? 'active' : ''}`;
         tabEl.onclick = () => switchBrowserTab(tab.id);
         
-        let tabTitle = tab.url.replace(/^https?:\/\//,'').split('/')[0];
+        let tabTitle = tab.url ? tab.url.replace(/^https?:\/\//,'').split('/')[0] : "Nueva Pestaña";
         if (tab.url.includes('archinime')) tabTitle = "Archinime";
 
         tabEl.innerHTML = `<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${tabTitle}</span>
@@ -95,19 +95,19 @@ function closeBrowserTab(id) {
         if(activeTabId === id) switchBrowserTab(browserTabs[browserTabs.length - 1].id);
         else renderBrowserTabs();
     } else {
-        addBrowserTab(); // Si cierra todo, se abre una nueva pestaña
+        addBrowserTab(''); 
     }
 }
 
 function navigateBrowser() { 
     let url = document.getElementById('browser-url').value;
-    if (!url.startsWith('http')) {
+    if (!url.startsWith('http') && url.trim() !== '') {
         url = 'https://www.bing.com/search?q=' + encodeURIComponent(url);
     }
     const tab = browserTabs.find(t => t.id === activeTabId);
     if(tab) tab.url = url;
     document.getElementById(`frame-${activeTabId}`).src = url;
-    renderBrowserTabs(); // Refrescar título
+    renderBrowserTabs(); 
 }
 
 // TERMINAL
@@ -395,9 +395,14 @@ function renderTrash() {
 }
 
 function restoreFromTrash(index) { 
-    if (confirm('¿Restaurar este elemento al escritorio?')) { const item = trashItems.splice(index, 1)[0];
+    if (confirm('¿Restaurar este elemento al escritorio?')) { 
+        const item = trashItems.splice(index, 1)[0];
         localStorage.setItem('trash', JSON.stringify(trashItems));
-        addDesktopIcon(item.name, item.icon, item.appId); renderTrash(); showToast('Restaurado'); } 
+        // Se envía "null" para que busque un espacio vacío inteligentemente
+        addDesktopIcon(item.name, item.icon, item.appId, 'icon-'+Date.now(), null, null); 
+        renderTrash(); 
+        showToast('Restaurado'); 
+    } 
 }
 
 const contextMenu = document.getElementById('context-menu');
@@ -419,10 +424,21 @@ document.getElementById('ctx-new-file')?.addEventListener('click', () => {
     if (fileName) { 
         let fname = fileName.endsWith('.txt') ? fileName : fileName + '.txt';
         let parent = listDir('/'); if (parent) { parent[fname] = { type: 'file', content: '' }; saveFS(); renderFiles(); }
-        addDesktopIcon(fname, '📄', 'notes', 'icon-'+Date.now()); showToast('Archivo creado'); 
+        addDesktopIcon(fname, '📄', 'notes', 'icon-'+Date.now(), null, null); 
+        showToast('Archivo creado'); 
     } 
 });
-document.getElementById('ctx-new-folder')?.addEventListener('click', () => { const folderName = prompt('Nombre de la Carpeta'); if (folderName) { let parent = listDir('/'); if (parent) { parent[folderName] = { type: 'dir', content: {} }; saveFS(); renderFiles(); } addDesktopIcon(folderName, '📁', 'files', 'icon-'+Date.now()); showToast('Carpeta creada'); } });
+
+document.getElementById('ctx-new-folder')?.addEventListener('click', () => { 
+    const folderName = prompt('Nombre de la Carpeta'); 
+    if (folderName) { 
+        let parent = listDir('/'); 
+        if (parent) { parent[folderName] = { type: 'dir', content: {} }; saveFS(); renderFiles(); } 
+        addDesktopIcon(folderName, '📁', 'files', 'icon-'+Date.now(), null, null); 
+        showToast('Carpeta creada'); 
+    } 
+});
+
 document.getElementById('ctx-wallpaper')?.addEventListener('click', () => cyclePremiumWallpapers());
 
 document.getElementById('ctx-rename')?.addEventListener('click', () => { if(!selectedIconId || selectedIconId === 'trash-icon') return; const iconDiv = document.getElementById(selectedIconId); if(iconDiv) { const newName = prompt("Nuevo nombre:"); if(newName) { iconDiv.querySelector('.icon-label').innerText = newName; saveDesktopIconPositions(); } } });
@@ -440,8 +456,24 @@ function startWeatherSimulation() {
 }
 
 function startBatterySimulation() { 
-    const battery = document.getElementById('battery-widget'); let level = 100;
-    setInterval(() => { level = Math.max(0, level - 1); battery.innerHTML = `<i class="fas fa-battery-${level > 75 ? 'full' : level > 50 ? 'three-quarters' : level > 25 ? 'half' : level > 10 ? 'quarter' : 'empty'}"></i> ${level}%`; if (level < 15) showToast('Alerta: Energía Crítica', 3000); }, 60000);
+    const battery = document.getElementById('battery-widget'); 
+    if ('getBattery' in navigator) {
+        navigator.getBattery().then(function(bat) {
+            function updateBattery() {
+                let level = Math.floor(bat.level * 100);
+                let icon = bat.charging ? 'fas fa-battery-charging' : (level > 75 ? 'fas fa-battery-full' : level > 50 ? 'fas fa-battery-three-quarters' : level > 25 ? 'fas fa-battery-half' : level > 10 ? 'fas fa-battery-quarter' : 'fas fa-battery-empty');
+                battery.innerHTML = `<i class="${icon}"></i> ${level}%`;
+            }
+            updateBattery();
+            bat.addEventListener('levelchange', updateBattery);
+            bat.addEventListener('chargingchange', updateBattery);
+        }).catch(() => {
+            battery.innerHTML = `<i class="fas fa-battery-full"></i> 100%`;
+        });
+    } else {
+        // Fallback para navegadores que bloquean la API
+        battery.innerHTML = `<i class="fas fa-battery-full"></i> 100%`;
+    }
 }
 
 function setupEventListeners() { 

@@ -32,18 +32,18 @@ body.light-mode { filter: invert(1) hue-rotate(180deg); }
 #desktop::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, rgba(188, 19, 254, 0.1) 0%, rgba(0,0,0,0.8) 100%); pointer-events: none; z-index: -5; }
 #desktop { position: relative; width: 100vw; height: 100vh; z-index: 1; color: white; display: block; overflow: hidden; }
 
-/* Iconos de Escritorio */
+/* Iconos de Escritorio TOTALMENTE TRANSPARENTES */
 .desktop-icons-container { position: relative; width: 100%; height: calc(100vh - 80px); }
 .desktop-icon { 
     position: absolute; width: 85px; height: 95px; padding: 10px; text-align: center; cursor: pointer; border-radius: 12px;
-    border: 1px solid transparent; 
-    transition: background 0.2s, box-shadow 0.2s, left 0.15s ease-out, top 0.15s ease-out;
-    backdrop-filter: blur(5px); display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    background: transparent;
+    border: none;
+    transition: transform 0.2s, left 0.15s ease-out, top 0.15s ease-out;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
     touch-action: none; 
 }
 .desktop-icon.dragging { transition: none; z-index: 100; }
-.desktop-icon:hover, .desktop-icon:active { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
-border: 1px solid var(--neon-cyan); box-shadow: 0 0 20px rgba(0, 243, 255, 0.3); }
+.desktop-icon:hover, .desktop-icon:active { transform: scale(1.05); }
 .icon-img { font-size: 40px; margin-bottom: 5px;
 filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); pointer-events: none; }
 .desktop-icon span { font-size: 12px; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); font-weight: 500;

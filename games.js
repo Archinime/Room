@@ -4,6 +4,19 @@
 let tttBoard = ['', '', '', '', '', '', '', '', ''];
 let tttTurn = '❌'; let tttGameOver = false;
 
+function initTTT() {
+    document.getElementById('ttt-restart-overlay')?.addEventListener('click', resetTTT);
+    document.getElementById('ttt-reset')?.addEventListener('click', resetTTT);
+}
+
+function resetTTT() {
+    tttBoard = ['', '', '', '', '', '', '', '', ''];
+    tttTurn = '❌'; 
+    tttGameOver = false; 
+    document.getElementById('ttt-overlay').classList.add('hidden'); 
+    renderTTT();
+}
+
 function renderTTT() {
     const boardDiv = document.getElementById('ttt-board');
     if (!boardDiv) return; boardDiv.innerHTML = '';
@@ -32,17 +45,17 @@ function checkTTTState() {
     const winLine = checkWinnerInfo();
     if (winLine) { renderTTT(); const cells = document.getElementById('ttt-board').children;
     winLine.forEach(idx => cells[idx].classList.add('winning-cell')); showTTTOverlay(tttTurn === '❌' ? `¡Ganaste a la IA!` : `¡La IA venció!`); tttGameOver = true;
-    playSound(tttTurn === '❌' ? 'win' : 'die'); autoRestartTTT(); } 
+    playSound(tttTurn === '❌' ? 'win' : 'die'); } 
     else if (!tttBoard.includes('')) { showTTTOverlay('¡Empate!');
-    tttGameOver = true; renderTTT(); playSound('die'); autoRestartTTT(); } 
-}
-function autoRestartTTT() { setTimeout(() => { tttBoard = ['', '', '', '', '', '', '', '', '']; tttTurn = '❌'; tttGameOver = false; document.getElementById('ttt-overlay').classList.add('hidden'); renderTTT(); }, 2500);
+    tttGameOver = true; renderTTT(); playSound('die'); } 
 }
 function checkWinnerInfo() { const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; for (let line of lines) { if (tttBoard[line[0]] && tttBoard[line[0]] === tttBoard[line[1]] && tttBoard[line[1]] === tttBoard[line[2]]) return line;
 } return null; }
 function showTTTOverlay(msg) { const overlay = document.getElementById('ttt-overlay'); document.getElementById('ttt-result').innerText = msg; overlay.classList.remove('hidden');
 }
-document.getElementById('ttt-reset')?.addEventListener('click', () => { tttBoard = ['', '', '', '', '', '', '', '', '']; tttTurn = '❌'; tttGameOver = false; document.getElementById('ttt-overlay').classList.add('hidden'); renderTTT(); });
+
+// Llama al inicio para activar botones
+initTTT();
 
 // --- NEON SNAKE ---
 let snakeCanvas = document.getElementById('snake-canvas'), snakeCtx = snakeCanvas?.getContext('2d');
@@ -133,7 +146,7 @@ function drawSnake() {
     snakeCtx.shadowColor = '#bc13fe'; snakeCtx.fillStyle = '#bc13fe'; snakeCtx.fillRect(food.x*15+1, food.y*15+1, 13,13); snakeCtx.shadowBlur = 0;
 }
 
-// --- NEON PONG ---
+// --- NEON PONG (¡Acelerado!) ---
 let pongCanvas = document.getElementById('pong-canvas'), pongCtx = pongCanvas?.getContext('2d');
 let pongLoop, pongBalls = [], pongPlayer, pongAI, pScore = 0, aiScore = 0, pongActive = false, pongLevel = 1, isPongPaused = false;
 function initPong() { 
@@ -146,7 +159,8 @@ function initPong() {
 function resetPong() {
     document.getElementById('pong-overlay').classList.add('hidden'); document.getElementById('pong-level-display').innerText = pongLevel;
     let pHeight = 80 - (pongLevel * 5);
-    let ballSpeed = 5 + (pongLevel * 0.8); 
+    // VELOCIDAD BASE MUCHO MÁS RÁPIDA
+    let ballSpeed = 8 + (pongLevel * 1.5); 
     pongPlayer = {x: 10, y: 160, w: 10, h: Math.max(30, pHeight)};
     pongAI = {x: 580, y: 160, w: 10, h: Math.max(30, pHeight)}; pongBalls = [];
     pongBalls.push({x: 300, y: 200, r: 8, dx: ballSpeed, dy: ballSpeed});
@@ -175,13 +189,13 @@ function updatePong() {
         let p = (ball.x < 300) ? pongPlayer : pongAI;
         if(ball.x - ball.r < p.x + p.w && ball.x + ball.r > p.x && ball.y + ball.r > p.y && ball.y - ball.r < p.y + p.h) { 
             playSound('hit'); ball.dx *= -1.05; 
-            let hitPoint = (ball.y - (p.y + p.h/2)) / (p.h/2); ball.dy = hitPoint * (5 + pongLevel) + (Math.random() - 0.5); ball.x = (ball.x < 300) ? p.x + p.w + ball.r : p.x - ball.r;
+            let hitPoint = (ball.y - (p.y + p.h/2)) / (p.h/2); ball.dy = hitPoint * (8 + pongLevel) + (Math.random() - 0.5); ball.x = (ball.x < 300) ? p.x + p.w + ball.r : p.x - ball.r;
         }
         if(ball.x < 0 && !isPongPaused) { scorePointPause(ball, 'ai');
         } else if(ball.x > 600 && !isPongPaused) { scorePointPause(ball, 'player'); }
     });
 }
-function resetBall(ball) { ball.x = 300; ball.y = 200; let speed = 5 + (pongLevel*0.8);
+function resetBall(ball) { ball.x = 300; ball.y = 200; let speed = 8 + (pongLevel*1.5);
     ball.dx = (ball.dx > 0 ? -speed : speed); ball.dy = speed * (Math.random() > 0.5 ? 1 : -1);
 }
 function drawPong() {
@@ -194,7 +208,7 @@ function drawPong() {
     pongCtx.shadowColor = '#bc13fe'; pongCtx.fillStyle = '#bc13fe'; pongCtx.fillRect(pongAI.x, pongAI.y, pongAI.w, pongAI.h); pongCtx.shadowBlur = 0;
 }
 
-// --- NEON BREAKOUT ---
+// --- NEON BREAKOUT (¡Acelerado!) ---
 let brkCanvas = document.getElementById('breakout-canvas'), brkCtx = brkCanvas?.getContext('2d');
 let brkActive = false, brkLoop, brkBalls = [], brkPaddle, brkBricks = [], brkPowerups = [], brkScore = 0, brkLives = 3, brkLevel = 1;
 function initBreakout() {
@@ -209,7 +223,9 @@ function initBreakout() {
 }
 function startBreakout() {
     document.getElementById('breakout-overlay').classList.add('hidden'); document.getElementById('breakout-level-display').innerText = brkLevel;
-    let paddleW = Math.max(80, 120 - (brkLevel * 5)); let bSpeed = 4.2 + (brkLevel * 0.4);
+    let paddleW = Math.max(80, 120 - (brkLevel * 5)); 
+    // BOLA MUCHO MÁS RÁPIDA DESDE EL NIVEL 1
+    let bSpeed = 7 + (brkLevel * 0.8);
     if(!brkActive && brkLives <= 0) { brkScore = 0; brkLives = 3; }
     brkPaddle = { w: paddleW, h: 12, x: 240, y: 480 };
     brkBalls = [{ x: 300, y: 465, r: 8, dx: bSpeed, dy: -bSpeed, fire: false }]; brkBricks = [];
@@ -242,7 +258,7 @@ function updateBreakout() {
         b.x += b.dx; b.y += b.dy;
         if(b.x + b.r > 600 || b.x - b.r < 0) { b.dx *= -1; playSound('hit'); } if(b.y - b.r < 0) { b.dy *= -1; playSound('hit'); }
         if(b.y + b.r > 500) { brkBalls.splice(i, 1);
-            if(brkBalls.length === 0) { brkLives--; document.getElementById('breakout-lives').innerText = brkLives; playSound('die'); if (brkLives > 0) { let speed = 4.2 + (brkLevel * 0.4);
+            if(brkBalls.length === 0) { brkLives--; document.getElementById('breakout-lives').innerText = brkLives; playSound('die'); if (brkLives > 0) { let speed = 7 + (brkLevel * 0.8);
             brkBalls.push({x: 300, y: 465, r: 8, dx: speed, dy: -speed, fire: false}); } else { brkActive = false;
             document.getElementById('breakout-result-text').innerText = 'GAME OVER'; document.getElementById('breakout-start-btn').innerText = 'Reintentar ' + brkLevel; document.getElementById('breakout-overlay').classList.remove('hidden'); return; } } continue;
         }
@@ -289,7 +305,7 @@ function flipMemory(index) {
         } }
 }
 
-// --- DECODIFICADOR (AHORCADO ANIME 50 PREGUNTAS) ---
+// --- DECODIFICADOR (AHORCADO ANIME EXPANDIDO) ---
 let hangmanDictionary = [ 
     { w: 'NARUTO', h: 'Ninja rubio con un zorro demonio dentro.' }, 
     { w: 'GOKU', h: 'Saiyajin criado en la Tierra.' }, 
@@ -340,13 +356,36 @@ let hangmanDictionary = [
     { w: 'REI', h: 'Primera Niña, piloto del EVA-00 de característico pelo azul.' },
     { w: 'KAGOME', h: 'Chica que viaja al Japón feudal a través de un pozo.' },
     { w: 'SASUKE', h: 'Último sobreviviente de su clan, viaja buscando venganza.' },
-    { w: 'BULMA', h: 'Brillante inventora del radar del dragón.' }
+    { w: 'BULMA', h: 'Brillante inventora del radar del dragón.' },
+    // NUEVAS PALABRAS AÑADIDAS
+    { w: 'ICHIGO', h: 'Shinigami sustituto pelinaranja.' },
+    { w: 'RUKIA', h: 'Shinigami que le dio sus poderes a Ichigo.' },
+    { w: 'LELOUCH', h: 'Príncipe exiliado que obtuvo el poder del Geass.' },
+    { w: 'GINTOKI', h: 'Samurái de cabello plateado y amante del azúcar.' },
+    { w: 'SHANKS', h: 'El pelirrojo que le dio su sombrero de paja a Luffy.' },
+    { w: 'USOPP', h: 'Francotirador mentiroso de los Sombreros de Paja.' },
+    { w: 'ROBIN', h: 'Arqueóloga que puede hacer florecer partes de su cuerpo.' },
+    { w: 'CHOPPER', h: 'Reno médico amante del algodón de azúcar.' },
+    { w: 'FRANKY', h: 'Cyborg carpintero de los Sombreros de Paja (¡SUPER!).' },
+    { w: 'JINBE', h: 'Gyojin timonel, caballero del mar.' },
+    { w: 'YUGI', h: 'Rey de los Duelos de Monstruos.' },
+    { w: 'KAIBA', h: 'Rival de Yugi, obsesionado con el Dragón Blanco de Ojos Azules.' },
+    { w: 'ASH', h: 'Eterno niño de 10 años de Pueblo Paleta.' },
+    { w: 'GOHAN', h: 'Hijo de Goku que derrotó a Cell.' },
+    { w: 'PICCOLO', h: 'Namekiano que entrenó a Gohan.' },
+    { w: 'KRILLIN', h: 'Mejor amigo de Goku, calvo y ha muerto varias veces.' },
+    { w: 'FREEZER', h: 'Emperador del mal que destruyó el planeta Vegeta.' },
+    { w: 'BROLY', h: 'Monstruo rosado creado por Bibidi.' },
+    { w: 'CELL', h: 'Bio-androide que absorbió a los androides 17 y 18.' },
+    { w: 'HINATA', h: 'De la familia principal Hyuga, esposa del séptimo Hokage.' },
+    { w: 'JIRAIYA', h: 'Uno de los legendarios Sannin, sabio sapo.' }
 ];
 
 let currentHangmanObj = null, hangmanGuessed = [], hangmanAttempts = 6, hintsUsed = false;
 
 function initHangman() { 
     document.getElementById('hangman-reset').addEventListener('click', resetHangman); 
+    document.getElementById('hangman-restart-overlay')?.addEventListener('click', resetHangman);
     document.getElementById('hangman-hint-btn').addEventListener('click', showHangmanHint);
     resetHangman();
 }
@@ -356,6 +395,7 @@ function resetHangman() {
     hangmanGuessed = []; 
     hangmanAttempts = 6; 
     hintsUsed = false; 
+    
     // MUESTRA LA DESCRIPCIÓN POR DEFECTO AUTOMÁTICAMENTE
     document.getElementById('hangman-hint-text').innerText = "Descripción: " + currentHangmanObj.h;
     
@@ -367,16 +407,13 @@ function resetHangman() {
 
 function showHangmanHint() { 
     if(!hintsUsed && currentHangmanObj && hangmanAttempts > 1) { 
-        // Encuentra las letras que aún no se han adivinado
         let unrevealed = currentHangmanObj.w.split('').filter(l => !hangmanGuessed.includes(l));
         
         if (unrevealed.length > 0) {
             let hintLetter = unrevealed[Math.floor(Math.random() * unrevealed.length)];
-            hangmanAttempts--; // Resta una vida por usar la pista
+            hangmanAttempts--; // Resta una vida
             hintsUsed = true; 
             document.getElementById('hangman-hint-btn').disabled = true; 
-            
-            // Simula que el usuario presionó la letra
             guessHangman(hintLetter); 
         }
     } 
@@ -411,7 +448,9 @@ function guessHangman(letter) {
         playSound('open'); 
     } 
     renderHangman();
-    if (hangmanAttempts === 0) gameOverHangman(false); 
+    if (hangmanAttempts === 0 && currentHangmanObj.w.split('').some(l => !hangmanGuessed.includes(l))) {
+        gameOverHangman(false); 
+    }
 }
 
 function gameOverHangman(win) { 
